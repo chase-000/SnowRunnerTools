@@ -79,7 +79,6 @@ namespace SnowPakTool {
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listcb file.cache_block" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /unpackcb file.cache_block [directory]" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /zippak directory file.pak" );
 		}
 
