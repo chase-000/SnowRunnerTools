@@ -46,7 +46,7 @@ namespace SnowPakTool {
 					skipped = true;
 					continue;
 				}
-				zip.CreateEntryFromFile ( location , relativeName , CompressionLevel.Optimal );
+				zip.CreateEntryFromFile ( location , relativeName , CompressionLevel.Fastest );
 			}
 			Console.WriteLine ();
 		}
