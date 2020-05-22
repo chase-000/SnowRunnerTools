@@ -34,7 +34,7 @@ namespace CacheBlockTool {
 
 
 
-		public CacheBlockFile ( Stream stream ) {
+		protected CacheBlockFile ( Stream stream ) {
 			if ( stream == null ) throw new ArgumentNullException ( nameof ( stream ) );
 			Stream = stream;
 		}
@@ -47,13 +47,13 @@ namespace CacheBlockTool {
 
 		public static string InternalNameToExternalName ( string name ) {
 			var match = InternalNameRegex.Match ( name );
-			if ( !match.Success ) throw new Exception ( $"Unexpected internal file name format: '{name}'" );
+			if ( !match.Success ) throw new InvalidDataException ( $"Unexpected internal file name format: '{name}'" );
 			var ps = match.Groups["ps"].Value;
 			var dir = match.Groups["dir"].Value;
 			var fn = match.Groups["fn"].Value;
 			if ( ps.IndexOfAny ( IOHelpers.InvalidNameChars ) >= 0
 						|| dir.IndexOfAny ( IOHelpers.InvalidPathChars ) >= 0
-						|| fn.IndexOfAny ( IOHelpers.InvalidNameChars ) >= 0 ) throw new Exception ( $"Invalid characters found in internal name: '{name}'" );
+						|| fn.IndexOfAny ( IOHelpers.InvalidNameChars ) >= 0 ) throw new InvalidDataException ( $"Invalid characters found in internal name: '{name}'" );
 			if ( dir.Length == 0 ) dir = "\\";
 			return ps + dir + fn;
 		}

@@ -63,7 +63,7 @@ namespace CacheBlockTool {
 			var sourceDirectory = Path.GetFullPath ( args[1] );
 			if ( !sourceDirectory.EndsWith ( "\\" ) ) sourceDirectory += '\\';
 			if ( !Directory.Exists ( sourceDirectory ) ) throw new IOException ( $"Source directory '{sourceDirectory}' does not exist." );
-			if ( Directory.EnumerateFiles ( sourceDirectory , "*" ).Any () ) throw new Exception ( $"Source directory '{sourceDirectory}' has files in it. It should only contain directories." );
+			if ( Directory.EnumerateFiles ( sourceDirectory , "*" ).Any () ) throw new IOException ( $"Source directory '{sourceDirectory}' has files in it. It should only contain directories." );
 
 		}
 

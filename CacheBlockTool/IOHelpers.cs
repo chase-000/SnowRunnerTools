@@ -11,8 +11,8 @@ namespace CacheBlockTool {
 		private static byte[] __Buffer = new byte[65536];
 
 
-		public static char[] InvalidPathChars = Path.GetInvalidPathChars ();
-		public static char[] InvalidNameChars = Path.GetInvalidFileNameChars ();
+		public static char[] InvalidPathChars { get; } = Path.GetInvalidPathChars ();
+		public static char[] InvalidNameChars { get; } = Path.GetInvalidFileNameChars ();
 
 
 		public static int ReadInt32 ( this Stream stream ) {
