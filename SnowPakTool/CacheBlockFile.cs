@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace PakTool {
+namespace SnowPakTool {
 
 	public abstract class CacheBlockFile {
 

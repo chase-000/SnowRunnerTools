@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 
-namespace PakTool {
+namespace SnowPakTool {
 
 	public static class ZipPakHelper {
 

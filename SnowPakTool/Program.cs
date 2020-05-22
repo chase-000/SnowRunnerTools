@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace PakTool {
+namespace SnowPakTool {
 
 	public static class Program {
 
@@ -76,11 +76,11 @@ namespace PakTool {
 
 		private static void PrintHelp () {
 			Console.WriteLine ( "Usage:" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /listcb file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /unpackcb file.cache_block [directory]" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /packcb directory file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /packcb directory file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /zippak directory file.pak" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listcb file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /unpackcb file.cache_block [directory]" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /zippak directory file.pak" );
 		}
 
 	}

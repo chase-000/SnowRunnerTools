@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace PakTool {
+namespace SnowPakTool {
 
 	public sealed class Crc32Managed : HashAlgorithm {
 

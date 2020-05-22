@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace PakTool {
+namespace SnowPakTool {
 
 	[DebuggerDisplay ( "{InternalName}: {Size} @ {RelativeOffset}" )]
 	public class FileEntry {

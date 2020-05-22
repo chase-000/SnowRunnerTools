@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace PakTool {
+namespace SnowPakTool {
 
 	/// <summary>
 	/// Simple helpers for cache_block file IO.

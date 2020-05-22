@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace PakTool {
+namespace SnowPakTool {
 
 	public static class MiscHelpers {
 
