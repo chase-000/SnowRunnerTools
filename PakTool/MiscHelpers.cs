@@ -11,9 +11,9 @@ namespace PakTool {
 		public static Encoding Encoding { get; } = Encoding.GetEncoding ( 437 );
 
 
-		public static int EnsureValidFileSize ( long length ) {
-			if ( length > int.MaxValue ) throw new NotSupportedException ( $"File size for exceeds {int.MaxValue}." );
-			return (int) length;
+		public static int EnsureFitsInt32 ( long value ) {
+			if ( value > int.MaxValue ) throw new NotSupportedException ( $"Value exceeds {int.MaxValue}." );
+			return (int) value;
 		}
 
 	}

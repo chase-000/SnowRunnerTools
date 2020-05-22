@@ -9,6 +9,7 @@ namespace PakTool {
 		/*
 			/packcb "D:\Games\SnowRunner_backs\settings\keys\tmp" "D:\Games\SnowRunner_backs\settings\keys\initial.1.cache_block"
 			/unpackcb "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
+			/zippak "D:\Games\SnowRunner\en_us\preload\paks\client\initial" "D:\Games\SnowRunner_backs\__mod\test.pak"
 		*/
 
 		public static int Main ( string[] args ) {
@@ -24,6 +25,10 @@ namespace PakTool {
 
 				case "/packcb":
 					PackCacheBlock ( args );
+					return 0;
+
+				case "/zippak":
+					ZipPakHelper.CreatePak ( args[1] , args[2] );
 					return 0;
 
 				default:
@@ -74,6 +79,8 @@ namespace PakTool {
 			Console.WriteLine ( $"  {nameof ( PakTool )} /listcb file.cache_block" );
 			Console.WriteLine ( $"  {nameof ( PakTool )} /unpackcb file.cache_block [directory]" );
 			Console.WriteLine ( $"  {nameof ( PakTool )} /packcb directory file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /packcb directory file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /zippak directory file.pak" );
 		}
 
 	}

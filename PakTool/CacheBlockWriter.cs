@@ -42,7 +42,7 @@ namespace PakTool {
 				Console.Write ( $"\rPacking: {i + 1}/{entries.Count}" );
 				var sourceLocation = Path.Combine ( sourceDirectory , item.ExternalName );
 				using ( var source = File.Open ( sourceLocation , FileMode.Open , FileAccess.Read , FileShare.None ) ) {
-					var size = MiscHelpers.EnsureValidFileSize ( source.Length );
+					var size = MiscHelpers.EnsureFitsInt32 ( source.Length );
 
 					Stream.Position = offsetsPosition + 8L * i;
 					Stream.WriteValue ( offset );
