@@ -15,11 +15,11 @@ namespace CacheBlockTool {
 		}
 
 
-		public void ExtractAll ( string targetDirectory ) {
-			Extract ( targetDirectory , FileEntries );
+		public void UnpackAll ( string targetDirectory ) {
+			Unpack ( targetDirectory , FileEntries );
 		}
 
-		public void Extract ( string targetDirectory , IReadOnlyCollection<FileEntry> entries ) {
+		public void Unpack ( string targetDirectory , IReadOnlyCollection<FileEntry> entries ) {
 			var i = 0;
 			foreach ( var item in entries ) {
 				i++;

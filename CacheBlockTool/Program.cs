@@ -55,7 +55,7 @@ namespace CacheBlockTool {
 			if ( Directory.Exists ( targetDirectory ) ) throw new IOException ( $"Target directory '{targetDirectory}' already exists." );
 			using ( var stream = File.OpenRead ( sourceLocation ) ) {
 				var reader = new CacheBlockReader ( stream );
-				reader.ExtractAll ( targetDirectory );
+				reader.UnpackAll ( targetDirectory );
 			}
 		}
 
