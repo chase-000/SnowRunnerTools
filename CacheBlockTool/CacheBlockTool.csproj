@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="CacheBlockFile.cs" />
     <Compile Include="CacheBlockReader.cs" />
+    <Compile Include="CacheBlockWriter.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="IOHelpers.cs" />
     <Compile Include="Program.cs" />

@@ -61,10 +61,12 @@ namespace CacheBlockTool {
 
 		private static void Pack ( string[] args ) {
 			var sourceDirectory = Path.GetFullPath ( args[1] );
-			if ( !sourceDirectory.EndsWith ( "\\" ) ) sourceDirectory += '\\';
-			if ( !Directory.Exists ( sourceDirectory ) ) throw new IOException ( $"Source directory '{sourceDirectory}' does not exist." );
-			if ( Directory.EnumerateFiles ( sourceDirectory , "*" ).Any () ) throw new IOException ( $"Source directory '{sourceDirectory}' has files in it. It should only contain directories." );
-
+			var targetLocation = args[2];
+			var entries = CacheBlockWriter.GetFileEntries ( sourceDirectory ).ToList ();
+			using ( var stream = File.Open ( targetLocation , FileMode.CreateNew , FileAccess.Write , FileShare.Read ) ) {
+				var writer = new CacheBlockWriter ( stream );
+				writer.Pack ( sourceDirectory , entries );
+			}
 		}
 
 		private static void PrintHelp () {
@@ -75,7 +77,5 @@ namespace CacheBlockTool {
 		}
 
 	}
-
-	//public class 
 
 }
