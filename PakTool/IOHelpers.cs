@@ -69,16 +69,20 @@ namespace PakTool {
 			stream.Write ( buffer , 0 , sizeof ( T ) );
 		}
 
-
-		public static void CopyBytesTo ( this Stream source , Stream target , int length ) {
+		public static void ProcessChunked ( this Stream stream , int length , Action<byte[] , int> action ) {
 			const int Chunk = 65536;
 			while ( length > 0 ) {
 				var buffer = GetBuffer ( Chunk );
-				var read = source.Read ( buffer , 0 , Math.Min ( length , Chunk ) );
+				var read = stream.Read ( buffer , 0 , Math.Min ( length , Chunk ) );
 				if ( read == 0 ) throw new EndOfStreamException ();
-				target.Write ( buffer , 0 , read );
+				action ( buffer , read );
 				length -= read;
 			}
+
+		}
+
+		public static void CopyBytesTo ( this Stream source , Stream target , int length ) {
+			ProcessChunked ( source , length , ( buffer , read ) => target.Write ( buffer , 0 , read ) );
 		}
 
 		public static InvalidDataException MakeBadMagicException ( long offset , string type , int expected , int actual ) {
@@ -95,6 +99,11 @@ namespace PakTool {
 			if ( actual != expected ) throw MakeBadMagicException ( stream.Position - 1 , "dword" , expected , actual );
 		}
 
+		public static string NormalizeDirectory ( string directory ) {
+			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
+			directory = Path.GetFullPath ( directory );
+			return directory.EndsWith ( "\\" ) ? directory : directory + '\\';
+		}
 
 
 		private static byte[] GetBuffer ( int length ) {

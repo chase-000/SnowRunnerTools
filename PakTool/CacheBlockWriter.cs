@@ -12,7 +12,7 @@ namespace PakTool {
 
 		public static IEnumerable<FileEntry> GetFileEntries ( string directory ) {
 			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
-			if ( !directory.EndsWith ( "\\" ) ) directory += '\\';
+			directory = IOHelpers.NormalizeDirectory ( directory );
 			if ( !Directory.Exists ( directory ) ) throw new IOException ( $"Source directory '{directory}' does not exist." );
 			if ( Directory.EnumerateFiles ( directory , "*" ).Any () ) throw new IOException ( $"Source directory '{directory}' has files in it. It should only contain directories." );
 			return Directory
