@@ -32,8 +32,14 @@ namespace SnowPakTool {
 
 		private void WriteOffsetsSizesZeroesAndData ( string sourceDirectory , IReadOnlyCollection<FileEntry> entries ) {
 			var offsetsPosition = Stream.Position;
-			var sizesPosition = offsetsPosition + 8L * entries.Count + 1;
-			var zeroesPosition = sizesPosition + 4L * entries.Count + 1;
+
+			Stream.Position = offsetsPosition + 8L * entries.Count;
+			Stream.WriteByte ( 1 );
+			var sizesPosition = Stream.Position;
+
+			Stream.Position = sizesPosition + 4L * entries.Count;
+			Stream.WriteByte ( 1 );
+			var zeroesPosition = Stream.Position;
 			BaseOffset = zeroesPosition + 4L * entries.Count;
 
 			var i = 0;
