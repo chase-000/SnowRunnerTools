@@ -45,6 +45,12 @@ namespace CacheBlockTool {
 			return CacheBlockFile.Encoding.GetString ( buffer , 0 , read );
 		}
 
+		public static void WriteString ( this Stream stream , string value ) {
+			var buffer = GetBuffer ( value.Length * 4 );
+			var length = CacheBlockFile.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
+			stream.Write ( buffer , 0 , length );
+		}
+
 		public static unsafe T ReadValue<T> ( this Stream stream ) where T : unmanaged {
 			var size = sizeof ( T );
 			var buffer = GetBuffer ( size );
@@ -56,7 +62,10 @@ namespace CacheBlockTool {
 		}
 
 		public static unsafe void WriteValue<T> ( this Stream stream , T value ) where T : unmanaged {
-			var buffer = SetBufferTo ( value );
+			var buffer = GetBuffer ( sizeof ( T ) );
+			fixed ( byte* p = buffer ) {
+				*(T*) p = value;
+			}
 			stream.Write ( buffer , 0 , sizeof ( T ) );
 		}
 
@@ -93,14 +102,6 @@ namespace CacheBlockTool {
 				__Buffer = new byte[length];
 			}
 			return __Buffer;
-		}
-
-		private static unsafe byte[] SetBufferTo<T> ( T value ) where T : unmanaged {
-			var buffer = GetBuffer ( sizeof ( T ) );
-			fixed ( byte* p = buffer ) {
-				*(T*) p = value;
-			}
-			return buffer;
 		}
 
 	}
