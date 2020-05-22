@@ -23,7 +23,7 @@ namespace CacheBlockTool {
 			var i = 0;
 			foreach ( var item in entries ) {
 				i++;
-				Console.Write ( $"\rExtracting: {i}/{entries.Count}" );
+				Console.Write ( $"\rUnpacking: {i}/{entries.Count}" );
 				var targetLocation = Path.Combine ( targetDirectory , item.ExternalName );
 				Stream.Position = BaseOffset + item.RelativeOffset;
 				Directory.CreateDirectory ( Path.GetDirectoryName ( targetLocation ) );
