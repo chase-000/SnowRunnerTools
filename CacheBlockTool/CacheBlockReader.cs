@@ -61,10 +61,7 @@ namespace CacheBlockTool {
 			for ( int i = 0; i < FileEntries.Length; i++ ) {
 				var length = Stream.ReadInt32 ();
 				var name = Stream.ReadString ( length );
-				FileEntries[i] = new FileEntry {
-					InternalName = name ,
-					ExternalName = InternalNameToExternalName ( name ) ,
-				};
+				FileEntries[i] = FileEntry.FromInternalName ( name );
 			}
 		}
 
