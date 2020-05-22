@@ -62,7 +62,7 @@ namespace CacheBlockTool {
 		private static void Pack ( string[] args ) {
 			var sourceDirectory = Path.GetFullPath ( args[1] );
 			var targetLocation = args[2];
-			var entries = CacheBlockWriter.GetFileEntries ( sourceDirectory ).ToList ();
+			var entries = CacheBlockWriter.GetFileEntries ( sourceDirectory ).OrderBy ( a => a.InternalName ).ToList ();
 			using ( var stream = File.Open ( targetLocation , FileMode.CreateNew , FileAccess.Write , FileShare.Read ) ) {
 				var writer = new CacheBlockWriter ( stream );
 				writer.Pack ( sourceDirectory , entries );
