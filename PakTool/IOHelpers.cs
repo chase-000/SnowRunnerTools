@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace CacheBlockTool {
+namespace PakTool {
 
 	/// <summary>
 	/// Simple helpers for cache_block file IO.

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace CacheBlockTool {
+namespace PakTool {
 
 	public static class Program {
 
@@ -71,9 +71,9 @@ namespace CacheBlockTool {
 
 		private static void PrintHelp () {
 			Console.WriteLine ( "Usage:" );
-			Console.WriteLine ( $"  {nameof ( CacheBlockTool )} /list file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( CacheBlockTool )} /unpack file.cache_block [directory]" );
-			Console.WriteLine ( $"  {nameof ( CacheBlockTool )} /pack directory file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /list file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /unpack file.cache_block [directory]" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /pack directory file.cache_block" );
 		}
 
 	}

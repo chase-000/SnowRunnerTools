@@ -2,7 +2,8 @@
 using System.IO;
 using System.Text;
 
-namespace CacheBlockTool {
+namespace PakTool {
+
 	public abstract class CacheBlockFile {
 
 		/// <summary>
