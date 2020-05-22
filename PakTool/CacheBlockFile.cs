@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 
 namespace PakTool {
 
@@ -21,13 +20,6 @@ namespace PakTool {
 			00000020:  00 00 00 00-53 33 44 52-45 53 4F 55-52 43 45 20      S3DRESOURCE
 			00000030:  20 20 20 20-00 00 00 00-00 00 00 00-00 00 00 00
 		*/
-
-		/// <summary>
-		/// Encoding used for file names. Could be some other encoding entirely, could be a multi-byte one, but works so far.
-		/// </summary>
-		public static Encoding Encoding { get; } = Encoding.GetEncoding ( 437 );
-
-
 
 
 		protected CacheBlockFile ( Stream stream ) {

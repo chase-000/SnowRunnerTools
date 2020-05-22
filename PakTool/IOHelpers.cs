@@ -42,12 +42,12 @@ namespace PakTool {
 		public static string ReadString ( this Stream stream , int length ) {
 			var buffer = GetBuffer ( length );
 			var read = stream.Read ( buffer , 0 , length );
-			return CacheBlockFile.Encoding.GetString ( buffer , 0 , read );
+			return MiscHelpers.Encoding.GetString ( buffer , 0 , read );
 		}
 
 		public static void WriteString ( this Stream stream , string value ) {
 			var buffer = GetBuffer ( value.Length * 4 );
-			var length = CacheBlockFile.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
+			var length = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
 			stream.Write ( buffer , 0 , length );
 		}
 
