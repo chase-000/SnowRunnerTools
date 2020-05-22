@@ -15,15 +15,15 @@ namespace PakTool {
 			switch ( args.Length > 0 ? args[0] : null ) {
 
 				case "/listcb":
-					List ( args );
+					ListCacheBlock ( args );
 					return 0;
 
 				case "/unpackcb":
-					Unpack ( args );
+					UnpackCacheBlock ( args );
 					return 0;
 
 				case "/packcb":
-					Pack ( args );
+					PackCacheBlock ( args );
 					return 0;
 
 				default:
@@ -33,7 +33,7 @@ namespace PakTool {
 		}
 
 
-		private static void List ( string[] args ) {
+		private static void ListCacheBlock ( string[] args ) {
 			using ( var stream = File.OpenRead ( args[1] ) ) {
 				var reader = new CacheBlockReader ( stream );
 				Console.WriteLine ( $"File entries: {reader.FileEntries.Length}" );
@@ -46,7 +46,7 @@ namespace PakTool {
 			}
 		}
 
-		private static void Unpack ( string[] args ) {
+		private static void UnpackCacheBlock ( string[] args ) {
 			var sourceLocation = Path.GetFullPath ( args[1] );
 			var sourceDirectory = Path.GetDirectoryName ( sourceLocation );
 			var targetDirectory = args.Length >= 3
@@ -59,7 +59,7 @@ namespace PakTool {
 			}
 		}
 
-		private static void Pack ( string[] args ) {
+		private static void PackCacheBlock ( string[] args ) {
 			var sourceDirectory = Path.GetFullPath ( args[1] );
 			var targetLocation = args[2];
 			var entries = CacheBlockWriter.GetFileEntries ( sourceDirectory ).OrderBy ( a => a.InternalName ).ToList ();
