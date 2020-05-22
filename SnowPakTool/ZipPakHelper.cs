@@ -28,7 +28,7 @@ namespace SnowPakTool {
 				WriteListFile ( zipStream , listLocation );
 				using ( var zip = new ZipArchive ( zipStream , ZipArchiveMode.Update ) ) {
 					AddFiles ( zip , sourceDirectory );
-					Console.WriteLine ( "Finalizing..." );
+					Console.WriteLine ( "Compressing..." );
 				}
 			}
 			Console.WriteLine ( "Done." );
