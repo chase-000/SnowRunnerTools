@@ -41,18 +41,19 @@ namespace CacheBlockTool {
 						|| dir.IndexOfAny ( IOHelpers.InvalidPathChars ) >= 0
 						|| fn.IndexOfAny ( IOHelpers.InvalidNameChars ) >= 0 ) throw new ArgumentException ( $"Invalid characters found in internal name: '{name}'" , nameof ( name ) );
 			if ( dir.Length == 0 ) dir = "\\";
-			return ps + dir + fn;
+			return $"[{ps}]{dir}{fn}";
 		}
 
 		public static string ExternalNameToInternalName ( string name ) {
 			if ( Path.IsPathRooted ( name ) ) throw new ArgumentException ( "External name can not be rooted." , nameof ( name ) );
 			var psSeparatorIndex = name.IndexOf ( '\\' );
 			if ( psSeparatorIndex <= 0 ) throw new ArgumentException ( "External name must contain top-level directory." , nameof ( name ) );
+			if ( psSeparatorIndex < 3 || name[0] != '[' || name[psSeparatorIndex - 1] != ']' ) throw new ArgumentException ( "External name top-level directory must be in '[name]' format." , nameof ( name ) );
 			var remainderLength = name.Length - psSeparatorIndex - 1;
 			if ( remainderLength <= 0 ) throw new ArgumentException ( "External name must contain file name." , nameof ( name ) );
 			var sb = new StringBuilder ( name.Length + 4 );
 			sb.Append ( '<' );
-			sb.Append ( name , 0 , psSeparatorIndex );
+			sb.Append ( name , 1 , psSeparatorIndex - 2 );
 			sb.Append ( '>' );
 			var fnSeparatorIndex = name.LastIndexOf ( '\\' , name.Length - 1 , remainderLength );
 			if ( fnSeparatorIndex < 0 ) {
