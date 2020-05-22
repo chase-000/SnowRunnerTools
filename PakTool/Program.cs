@@ -7,22 +7,22 @@ namespace PakTool {
 	public static class Program {
 
 		/*
-			/pack "D:\Games\SnowRunner_backs\settings\keys\tmp" "D:\Games\SnowRunner_backs\settings\keys\initial.1.cache_block"
-			/unpack "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
+			/packcb "D:\Games\SnowRunner_backs\settings\keys\tmp" "D:\Games\SnowRunner_backs\settings\keys\initial.1.cache_block"
+			/unpackcb "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
 		*/
 
 		public static int Main ( string[] args ) {
 			switch ( args.Length > 0 ? args[0] : null ) {
 
-				case "/list":
+				case "/listcb":
 					List ( args );
 					return 0;
 
-				case "/unpack":
+				case "/unpackcb":
 					Unpack ( args );
 					return 0;
 
-				case "/pack":
+				case "/packcb":
 					Pack ( args );
 					return 0;
 
@@ -71,9 +71,9 @@ namespace PakTool {
 
 		private static void PrintHelp () {
 			Console.WriteLine ( "Usage:" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /list file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /unpack file.cache_block [directory]" );
-			Console.WriteLine ( $"  {nameof ( PakTool )} /pack directory file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /listcb file.cache_block" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /unpackcb file.cache_block [directory]" );
+			Console.WriteLine ( $"  {nameof ( PakTool )} /packcb directory file.cache_block" );
 		}
 
 	}
