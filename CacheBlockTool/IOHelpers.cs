@@ -16,10 +16,7 @@ namespace CacheBlockTool {
 
 
 		public static int ReadInt32 ( this Stream stream ) {
-			var buffer = GetBuffer ( 4 );
-			var read = stream.Read ( buffer , 0 , 4 );
-			if ( read != 4 ) throw new EndOfStreamException ();
-			return BitConverter.ToInt32 ( buffer , 0 );
+			return ReadValue<int> ( stream );
 		}
 
 		public static int[] ReadInt32Array ( this Stream stream , int count ) {
@@ -31,10 +28,7 @@ namespace CacheBlockTool {
 		}
 
 		public static long ReadInt64 ( this Stream stream ) {
-			var buffer = GetBuffer ( 8 );
-			var read = stream.Read ( buffer , 0 , 8 );
-			if ( read != 8 ) throw new EndOfStreamException ();
-			return BitConverter.ToInt64 ( buffer , 0 );
+			return ReadValue<long> ( stream );
 		}
 
 		public static long[] ReadInt64Array ( this Stream stream , int count ) {
@@ -50,6 +44,22 @@ namespace CacheBlockTool {
 			var read = stream.Read ( buffer , 0 , length );
 			return CacheBlockFile.Encoding.GetString ( buffer , 0 , read );
 		}
+
+		public static unsafe T ReadValue<T> ( this Stream stream ) where T : unmanaged {
+			var size = sizeof ( T );
+			var buffer = GetBuffer ( size );
+			var read = stream.Read ( buffer , 0 , size );
+			if ( read != size ) throw new EndOfStreamException ();
+			fixed ( byte* p = buffer ) {
+				return *(T*) p;
+			}
+		}
+
+		public static unsafe void WriteValue<T> ( this Stream stream , T value ) where T : unmanaged {
+			var buffer = SetBufferTo ( value );
+			stream.Write ( buffer , 0 , sizeof ( T ) );
+		}
+
 
 		public static void CopyBytesTo ( this Stream source , Stream target , int length ) {
 			const int Chunk = 65536;
@@ -83,6 +93,14 @@ namespace CacheBlockTool {
 				__Buffer = new byte[length];
 			}
 			return __Buffer;
+		}
+
+		private static unsafe byte[] SetBufferTo<T> ( T value ) where T : unmanaged {
+			var buffer = GetBuffer ( sizeof ( T ) );
+			fixed ( byte* p = buffer ) {
+				*(T*) p = value;
+			}
+			return buffer;
 		}
 
 	}
