@@ -15,6 +15,10 @@ namespace SnowPakTool {
 		public static int Main ( string[] args ) {
 			switch ( args.Length > 0 ? args[0] : null ) {
 
+				case "/license":
+					PrintLicense ();
+					return 0;
+
 				case "/listcb":
 					ListCacheBlock ( args );
 					return 0;
@@ -37,6 +41,12 @@ namespace SnowPakTool {
 			}
 		}
 
+
+		private static void PrintLicense () {
+			using var stream = typeof ( Program ).Assembly.GetManifestResourceStream ( $"{nameof ( SnowPakTool )}.LICENSE" );
+			using var reader = new StreamReader ( stream );
+			Console.WriteLine ( reader.ReadToEnd () );
+		}
 
 		private static void ListCacheBlock ( string[] args ) {
 			using ( var stream = File.OpenRead ( args[1] ) ) {
@@ -76,6 +86,7 @@ namespace SnowPakTool {
 
 		private static void PrintHelp () {
 			Console.WriteLine ( "Usage:" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /license" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listcb file.cache_block" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /unpackcb file.cache_block [directory]" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
