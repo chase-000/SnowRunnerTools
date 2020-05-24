@@ -5,6 +5,27 @@ VisualStudioVersion = 16.0.28917.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowPakTool", "SnowPakTool\SnowPakTool.csproj", "{491AAEB0-613A-4A27-BFCD-69C2480D13C7}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "__Global", "__Global\", "{2C1DE8F3-F44E-4897-8D8F-13703D37AA08}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_12138"
+		Debug.AspNetCompiler.PhysicalPath = "__Global\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_12138\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_12138"
+		Release.AspNetCompiler.PhysicalPath = "__Global\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_12138\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "12138"
+		SlnRelativePath = "__Global\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +36,9 @@ Global
 		{491AAEB0-613A-4A27-BFCD-69C2480D13C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{491AAEB0-613A-4A27-BFCD-69C2480D13C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{491AAEB0-613A-4A27-BFCD-69C2480D13C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C1DE8F3-F44E-4897-8D8F-13703D37AA08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C1DE8F3-F44E-4897-8D8F-13703D37AA08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C1DE8F3-F44E-4897-8D8F-13703D37AA08}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
