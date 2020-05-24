@@ -8,7 +8,7 @@ but require a bit of special handling to create.
 Used to compress files into a single PAK file and for packing/unpacking _initial.pak\initial.cache_block_ file that
 contains various game data, including UI layout, settings and translations.
 
-As an example, here's how to increase first and second person FOV slider ranges (they're normally limited to 130 max):
+As an example, here's how to increase first and third person FOV slider ranges (they're normally limited to 130 max):
 
 ```bat
 set client=D:\Games\SnowRunner\en_us\preload\paks\client
