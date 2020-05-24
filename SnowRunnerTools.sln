@@ -26,6 +26,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "__Global", "__Global\", "{2
 		SlnRelativePath = "__Global\"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowTruckConfig", "SnowTruckConfig\SnowTruckConfig.csproj", "{53841067-66D5-48A0-93C9-4C193D78EEA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{2C1DE8F3-F44E-4897-8D8F-13703D37AA08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C1DE8F3-F44E-4897-8D8F-13703D37AA08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C1DE8F3-F44E-4897-8D8F-13703D37AA08}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{53841067-66D5-48A0-93C9-4C193D78EEA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53841067-66D5-48A0-93C9-4C193D78EEA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53841067-66D5-48A0-93C9-4C193D78EEA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53841067-66D5-48A0-93C9-4C193D78EEA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
