@@ -38,7 +38,7 @@ namespace SnowPakTool {
 					ZipPakHelper.CreatePak ( args[1] , args[2] );
 					return 0;
 
-				case "/lltest":
+				case "/llvalidate":
 					LoadListTest ( args[1] );
 					return 0;
 
@@ -48,12 +48,15 @@ namespace SnowPakTool {
 			}
 		}
 
-		[DebuggerDisplay ( "{Strings[0]} @{Offset,X}" )]
-		private sealed class LoadListEntry {
-			public long Offset { get; set; }
+		[DebuggerDisplay ( "{Strings[0]} ({Values.Length}) @{OrderEntryOffset,X}/{NamesEntryOffset,X}" )]
+		public class LoadListRawEntry {
+			public int Index { get; set; }
+			public long OrderEntryOffset { get; set; }
+			public long NamesEntryOffset { get; set; }
 			public byte[] MagicA { get; set; }
 			public byte[] MagicB { get; set; }
 			public string[] Strings { get; set; }
+			public int[] Values { get; set; }
 
 			//public string InternalName { get; set; }
 			//public string Extension { get; set; }
@@ -63,12 +66,41 @@ namespace SnowPakTool {
 			//public byte[] MagicC { get; set; }
 		}
 
+
 		private static void LoadListTest ( string loadListLocation ) {
 			using var stream = File.OpenRead ( loadListLocation );
-			stream.Position = 0x0000E258;
-			var entries = new List<LoadListEntry> ();
-			while ( stream.Position < stream.Length ) {
-				var entry = new LoadListEntry { Offset = stream.Position };
+
+			/*
+				byte map:
+					5: start?
+					1: type-1
+					2: type-3
+					6: end?
+			*/
+
+			stream.ReadMagicInt32 ( 1 ); //array length?
+			stream.ReadMagicByte ( 1 ); //data type?
+			var entriesCount = stream.ReadInt32 ();
+			stream.ReadMagicInt32 ( 3 ); //???
+			stream.ReadMagicByte ( 1 ); //???
+			var entryTypes = stream.ReadByteArray ( entriesCount );
+
+			stream.ReadMagicByte ( 1 ); //???
+
+			var entries = new LoadListRawEntry[entriesCount];
+			for ( int i = 0; i < entriesCount; i++ ) {
+				var entry = entries[i] = new LoadListRawEntry { Index = i };
+				entry.OrderEntryOffset = stream.Position;
+				var count = stream.ReadInt32 ();
+				stream.ReadMagicByte ( 1 );
+				entry.Values = stream.ReadInt32Array ( count );
+			}
+
+			stream.ReadMagicByte ( 1 ); //???
+			MiscHelpers.Assert ( stream.Position == 0x0000E24E );
+
+			foreach ( var entry in entries ) {
+				entry.NamesEntryOffset = stream.Position;
 				var stringsCount = stream.ReadInt32 ();
 				var magicBCount = stream.ReadInt32 ();
 				entry.MagicA = stream.ReadByteArray ( stringsCount );
@@ -77,37 +109,21 @@ namespace SnowPakTool {
 				for ( int i = 0; i < stringsCount; i++ ) {
 					entry.Strings[i] = stream.ReadLength32String ();
 				}
-				entries.Add ( entry );
 			}
+			MiscHelpers.Assert ( stream.Position == stream.Length );
 
 			var extensions = entries.Where ( a => a.Strings.Length == 3 ).GroupBy ( a => a.Strings[1] ).Select ( a => a.Key ).ToList ();
 			var paks = entries.Where ( a => a.Strings.Length == 3 ).GroupBy ( a => a.Strings[2] ).Select ( a => a.Key ).ToList ();
 			var internalNames = entries.Where ( a => a.Strings.Length == 3 ).Select ( a => a.Strings[0] ).ToList ();
 
 			MiscHelpers.Assert ( entries.All ( entry => entry.Strings.Length == 0 || entry.Strings.Length == 1 || entry.Strings.Length == 3 ) );
-			MiscHelpers.Assert ( entries.Single ( entry => entry.Strings.Length == 0 ) is var _ );
+			MiscHelpers.Assert ( entries.Count ( entry => entry.Strings.Length == 0 ) == 2 );
+			MiscHelpers.Assert ( entries.First ().Strings.Length == 0 );
 			MiscHelpers.Assert ( entries.Last ().Strings.Length == 0 );
 			MiscHelpers.Assert ( entries.All ( entry => entry.MagicB.Length == 2 ) );
 			MiscHelpers.Assert ( entries.All ( entry => entry.MagicA.All ( a => a == 1 ) ) );
 			MiscHelpers.Assert ( entries.All ( entry => entry.MagicB.All ( a => a == 1 ) ) );
-			MiscHelpers.Assert ( entries.GroupBy ( a => a.Strings.FirstOrDefault () ?? "" ).Count () == entries.Count );
-
-			stream.Position = 0x1043;
-			while ( stream.Position < 0xE24D ) {
-				Console.Write ( $"{stream.Position:X8}:" );
-				var count = stream.ReadInt32 ();
-				if ( count > 1 ) Debugger.Break ();
-				Console.Write ( $" {count:X}" );
-				stream.ReadMagicByte ( 1 ); //data type? 1:int32?
-				var values = stream.ReadInt32Array ( count );
-				Console.Write ( " [ " );
-				Console.Write ( string.Join ( ", " , values ) );
-				Console.Write ( " ]" );
-				Console.WriteLine ();
-				//if ( stream.Position >= 0x6A40 ) {
-				//	Debugger.Break ();
-				//}
-			}
+			MiscHelpers.Assert ( entries.Skip ( 1 ).Take ( entries.Length - 2 ).GroupBy ( a => a.Strings[0] ).Count () == entriesCount - 2 );
 		}
 
 		private static void PrintLicense () {
@@ -159,6 +175,7 @@ namespace SnowPakTool {
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /unpackcb file.cache_block [directory]" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /zippak directory file.pak" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /llvalidate pak.load_list" );
 		}
 
 	}
