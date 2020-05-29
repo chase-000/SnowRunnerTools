@@ -57,6 +57,14 @@ namespace SnowPakTool {
 			return ReadString ( stream , length );
 		}
 
+		public static string[] ReadLength32StringsArray ( this Stream stream , int count ) {
+			var result = new string[count];
+			for ( int i = 0; i < count; i++ ) {
+				result[i] = ReadLength32String ( stream );
+			}
+			return result;
+		}
+
 		public static void WriteString ( this Stream stream , string value ) {
 			var buffer = GetBuffer ( value.Length * 4 );
 			var length = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
@@ -76,6 +84,14 @@ namespace SnowPakTool {
 			fixed ( byte* p = buffer ) {
 				return *(T*) p;
 			}
+		}
+
+		public static T[] ReadValuesArray<T> ( this Stream stream , int count ) where T : unmanaged {
+			var result = new T[count];
+			for ( int i = 0; i < count; i++ ) {
+				result[i] = ReadValue<T> ( stream );
+			}
+			return result;
 		}
 
 		public static unsafe void WriteValue<T> ( this Stream stream , T value ) where T : unmanaged {

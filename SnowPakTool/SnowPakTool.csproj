@@ -57,6 +57,13 @@
     <Compile Include="Crc32Managed.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="IOHelpers.cs" />
+    <Compile Include="LoadListAssetEntry.cs" />
+    <Compile Include="LoadListEndEntry.cs" />
+    <Compile Include="LoadListEntryBase.cs" />
+    <Compile Include="LoadListEntryType.cs" />
+    <Compile Include="LoadListFile.cs" />
+    <Compile Include="LoadListStageEntry.cs" />
+    <Compile Include="LoadListStartEntry.cs" />
     <Compile Include="MiscHelpers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
