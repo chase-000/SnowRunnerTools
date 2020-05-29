@@ -45,10 +45,20 @@ namespace SnowPakTool {
 			return MiscHelpers.Encoding.GetString ( buffer , 0 , read );
 		}
 
+		public static string ReadLength32String ( this Stream stream ) {
+			var length = stream.ReadInt32 ();
+			return ReadString ( stream , length );
+		}
+
 		public static void WriteString ( this Stream stream , string value ) {
 			var buffer = GetBuffer ( value.Length * 4 );
 			var length = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
 			stream.Write ( buffer , 0 , length );
+		}
+
+		public static void WriteLength32String ( this Stream stream , string value ) {
+			WriteValue ( stream , value.Length );
+			WriteString ( stream , value );
 		}
 
 		public static unsafe T ReadValue<T> ( this Stream stream ) where T : unmanaged {
