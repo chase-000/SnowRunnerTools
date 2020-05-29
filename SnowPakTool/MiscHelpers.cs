@@ -16,6 +16,10 @@ namespace SnowPakTool {
 			return (int) value;
 		}
 
+		internal static void Assert ( bool value ) {
+			if ( !value ) throw new InvalidOperationException ();
+		}
+
 	}
 
 }

@@ -48,30 +48,65 @@ namespace SnowPakTool {
 			}
 		}
 
-		[DebuggerDisplay ( "{InternalName} @{Offset,X}" )]
+		[DebuggerDisplay ( "{Strings[0]} @{Offset,X}" )]
 		private sealed class LoadListEntry {
 			public long Offset { get; set; }
-			public string InternalName { get; set; }
-			public string Extension { get; set; }
-			public string PakName { get; set; }
-			public int MagicA { get; set; }
-			public int MagicB { get; set; }
-			public byte[] MagicC { get; set; }
+			public byte[] MagicA { get; set; }
+			public byte[] MagicB { get; set; }
+			public string[] Strings { get; set; }
+
+			//public string InternalName { get; set; }
+			//public string Extension { get; set; }
+			//public string PakName { get; set; }
+			//public int MagicA { get; set; }
+			//public int MagicB { get; set; }
+			//public byte[] MagicC { get; set; }
 		}
 
 		private static void LoadListTest ( string loadListLocation ) {
 			using var stream = File.OpenRead ( loadListLocation );
-			stream.Position = 0x0000E2A7;
+			stream.Position = 0x0000E258;
 			var entries = new List<LoadListEntry> ();
 			while ( stream.Position < stream.Length ) {
 				var entry = new LoadListEntry { Offset = stream.Position };
-				entry.InternalName = stream.ReadLength32String ();
-				entry.Extension = stream.ReadLength32String ();
-				entry.PakName = stream.ReadLength32String ();
-				entry.MagicA = stream.ReadInt32 ();
-				entry.MagicB = stream.ReadInt32 ();
-				entry.MagicC = stream.ReadByteArray ( 5 );
+				var stringsCount = stream.ReadInt32 ();
+				var magicBCount = stream.ReadInt32 ();
+				entry.MagicA = stream.ReadByteArray ( stringsCount );
+				entry.MagicB = stream.ReadByteArray ( magicBCount );
+				entry.Strings = new string[stringsCount];
+				for ( int i = 0; i < stringsCount; i++ ) {
+					entry.Strings[i] = stream.ReadLength32String ();
+				}
 				entries.Add ( entry );
+			}
+
+			var extensions = entries.Where ( a => a.Strings.Length == 3 ).GroupBy ( a => a.Strings[1] ).Select ( a => a.Key ).ToList ();
+			var paks = entries.Where ( a => a.Strings.Length == 3 ).GroupBy ( a => a.Strings[2] ).Select ( a => a.Key ).ToList ();
+			var internalNames = entries.Where ( a => a.Strings.Length == 3 ).Select ( a => a.Strings[0] ).ToList ();
+
+			MiscHelpers.Assert ( entries.All ( entry => entry.Strings.Length == 0 || entry.Strings.Length == 1 || entry.Strings.Length == 3 ) );
+			MiscHelpers.Assert ( entries.Single ( entry => entry.Strings.Length == 0 ) is var _ );
+			MiscHelpers.Assert ( entries.Last ().Strings.Length == 0 );
+			MiscHelpers.Assert ( entries.All ( entry => entry.MagicB.Length == 2 ) );
+			MiscHelpers.Assert ( entries.All ( entry => entry.MagicA.All ( a => a == 1 ) ) );
+			MiscHelpers.Assert ( entries.All ( entry => entry.MagicB.All ( a => a == 1 ) ) );
+			MiscHelpers.Assert ( entries.GroupBy ( a => a.Strings.FirstOrDefault () ?? "" ).Count () == entries.Count );
+
+			stream.Position = 0x1043;
+			while ( stream.Position < 0xE24D ) {
+				Console.Write ( $"{stream.Position:X8}:" );
+				var count = stream.ReadInt32 ();
+				if ( count > 1 ) Debugger.Break ();
+				Console.Write ( $" {count:X}" );
+				stream.ReadMagicByte ( 1 ); //data type? 1:int32?
+				var values = stream.ReadInt32Array ( count );
+				Console.Write ( " [ " );
+				Console.Write ( string.Join ( ", " , values ) );
+				Console.Write ( " ]" );
+				Console.WriteLine ();
+				//if ( stream.Position >= 0x6A40 ) {
+				//	Debugger.Break ();
+				//}
 			}
 		}
 
