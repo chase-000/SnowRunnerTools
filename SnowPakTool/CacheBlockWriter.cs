@@ -68,8 +68,7 @@ namespace SnowPakTool {
 
 		private void WriteNamesTable ( IReadOnlyCollection<FileEntry> entries ) {
 			foreach ( var item in entries ) {
-				Stream.WriteValue ( item.InternalName.Length );
-				Stream.WriteString ( item.InternalName );
+				Stream.WriteLength32String ( item.InternalName );
 			}
 		}
 

@@ -28,6 +28,11 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "__Global", "__Global\", "{2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowTruckConfig", "SnowTruckConfig\SnowTruckConfig.csproj", "{53841067-66D5-48A0-93C9-4C193D78EEA7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FAB46086-E4C7-4994-A907-7EB24F745A9B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

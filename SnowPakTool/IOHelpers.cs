@@ -39,16 +39,41 @@ namespace SnowPakTool {
 			return result;
 		}
 
+		public static byte[] ReadByteArray ( this Stream stream , int count ) {
+			var result = new byte[count];
+			var read = stream.Read ( result , 0 , count );
+			if ( read < count ) throw new EndOfStreamException ();
+			return result;
+		}
+
 		public static string ReadString ( this Stream stream , int length ) {
 			var buffer = GetBuffer ( length );
 			var read = stream.Read ( buffer , 0 , length );
 			return MiscHelpers.Encoding.GetString ( buffer , 0 , read );
 		}
 
+		public static string ReadLength32String ( this Stream stream ) {
+			var length = stream.ReadInt32 ();
+			return ReadString ( stream , length );
+		}
+
+		public static string[] ReadLength32StringsArray ( this Stream stream , int count ) {
+			var result = new string[count];
+			for ( int i = 0; i < count; i++ ) {
+				result[i] = ReadLength32String ( stream );
+			}
+			return result;
+		}
+
 		public static void WriteString ( this Stream stream , string value ) {
 			var buffer = GetBuffer ( value.Length * 4 );
 			var length = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
 			stream.Write ( buffer , 0 , length );
+		}
+
+		public static void WriteLength32String ( this Stream stream , string value ) {
+			WriteValue ( stream , value.Length );
+			WriteString ( stream , value );
 		}
 
 		public static unsafe T ReadValue<T> ( this Stream stream ) where T : unmanaged {
@@ -59,6 +84,14 @@ namespace SnowPakTool {
 			fixed ( byte* p = buffer ) {
 				return *(T*) p;
 			}
+		}
+
+		public static T[] ReadValuesArray<T> ( this Stream stream , int count ) where T : unmanaged {
+			var result = new T[count];
+			for ( int i = 0; i < count; i++ ) {
+				result[i] = ReadValue<T> ( stream );
+			}
+			return result;
 		}
 
 		public static unsafe void WriteValue<T> ( this Stream stream , T value ) where T : unmanaged {

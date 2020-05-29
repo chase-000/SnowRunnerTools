@@ -59,8 +59,7 @@ namespace SnowPakTool {
 
 		private void ReadNames () {
 			for ( int i = 0; i < FileEntries.Length; i++ ) {
-				var length = Stream.ReadInt32 ();
-				var name = Stream.ReadString ( length );
+				var name = Stream.ReadLength32String ();
 				FileEntries[i] = FileEntry.FromInternalName ( name );
 			}
 		}

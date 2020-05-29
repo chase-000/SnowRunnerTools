@@ -10,6 +10,7 @@ namespace SnowPakTool {
 			/packcb "D:\Games\SnowRunner_backs\settings\keys\tmp" "D:\Games\SnowRunner_backs\settings\keys\initial.1.cache_block"
 			/unpackcb "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
 			/zippak "D:\Games\SnowRunner\en_us\preload\paks\client\initial" "D:\Games\SnowRunner_backs\__mod\test.pak"
+			/listll "D:\Games\SnowRunner_backs\mods\.staging\initial-pak\pak.load_list"
 		*/
 
 		public static int Main ( string[] args ) {
@@ -33,6 +34,10 @@ namespace SnowPakTool {
 
 				case "/zippak":
 					ZipPakHelper.CreatePak ( args[1] , args[2] );
+					return 0;
+
+				case "/listll":
+					LoadListTest ( args[1] );
 					return 0;
 
 				default:
@@ -84,6 +89,25 @@ namespace SnowPakTool {
 			}
 		}
 
+		private static void LoadListTest ( string loadListLocation ) {
+			var entries = LoadListFile.ReadEntries ( loadListLocation );
+			foreach ( var item in entries ) {
+				Console.WriteLine ( item );
+			}
+
+			Console.WriteLine ( "\nLoaders:" );
+			var loaders = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.Loader ).Select ( a => a.Key ).ToList ();
+			foreach ( var item in loaders ) {
+				Console.WriteLine ( item );
+			}
+
+			Console.WriteLine ( "\nPAKs:" );
+			var paks = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.PakName ).Select ( a => a.Key ).ToList ();
+			foreach ( var item in paks ) {
+				Console.WriteLine ( item );
+			}
+		}
+
 		private static void PrintHelp () {
 			Console.WriteLine ( "Usage:" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /license" );
@@ -91,6 +115,7 @@ namespace SnowPakTool {
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /unpackcb file.cache_block [directory]" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /zippak directory file.pak" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listll pak.load_list" );
 		}
 
 	}
