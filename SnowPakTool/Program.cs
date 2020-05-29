@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace SnowPakTool {
 
@@ -35,12 +38,42 @@ namespace SnowPakTool {
 					ZipPakHelper.CreatePak ( args[1] , args[2] );
 					return 0;
 
+				case "/lltest":
+					LoadListTest ( args[1] );
+					return 0;
+
 				default:
 					PrintHelp ();
 					return 1;
 			}
 		}
 
+		[DebuggerDisplay ( "{InternalName} @{Offset,X}" )]
+		private sealed class LoadListEntry {
+			public long Offset { get; set; }
+			public string InternalName { get; set; }
+			public string Extension { get; set; }
+			public string PakName { get; set; }
+			public int MagicA { get; set; }
+			public int MagicB { get; set; }
+			public byte[] MagicC { get; set; }
+		}
+
+		private static void LoadListTest ( string loadListLocation ) {
+			using var stream = File.OpenRead ( loadListLocation );
+			stream.Position = 0x0000E2A7;
+			var entries = new List<LoadListEntry> ();
+			while ( stream.Position < stream.Length ) {
+				var entry = new LoadListEntry { Offset = stream.Position };
+				entry.InternalName = stream.ReadLength32String ();
+				entry.Extension = stream.ReadLength32String ();
+				entry.PakName = stream.ReadLength32String ();
+				entry.MagicA = stream.ReadInt32 ();
+				entry.MagicB = stream.ReadInt32 ();
+				entry.MagicC = stream.ReadByteArray ( 5 );
+				entries.Add ( entry );
+			}
+		}
 
 		private static void PrintLicense () {
 			using var stream = typeof ( Program ).Assembly.GetManifestResourceStream ( $"{nameof ( SnowPakTool )}.LICENSE" );

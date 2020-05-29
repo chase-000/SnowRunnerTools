@@ -39,6 +39,13 @@ namespace SnowPakTool {
 			return result;
 		}
 
+		public static byte[] ReadByteArray ( this Stream stream , int count ) {
+			var result = new byte[count];
+			var read = stream.Read ( result , 0 , count );
+			if ( read < count ) throw new EndOfStreamException ();
+			return result;
+		}
+
 		public static string ReadString ( this Stream stream , int length ) {
 			var buffer = GetBuffer ( length );
 			var read = stream.Read ( buffer , 0 , length );
