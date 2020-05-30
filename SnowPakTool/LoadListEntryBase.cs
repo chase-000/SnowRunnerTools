@@ -1,12 +1,17 @@
 ﻿using System;
+using System.IO;
 
 namespace SnowPakTool {
 
 	public abstract class LoadListEntryBase {
 
+		public static int ExpectedMagicBCount => 2;
+		public static byte ExpectedMagicAValue => 1;
+		public static byte ExpectedMagicBValue => 1;
+
 		public int Index { get; set; }
 		public abstract LoadListEntryType Type { get; }
-		public abstract int ExpectedStringsCount { get; }
+		public virtual int ExpectedStringsCount => 0;
 		public long DependencyEntryOffset { get; set; }
 		public long StringsEntryOffset { get; set; }
 		public byte[] MagicA { get; set; }
@@ -23,8 +28,44 @@ namespace SnowPakTool {
 			}
 		}
 
+		public virtual void WriteType ( Stream stream ) {
+			stream.WriteByte ( (byte) Type );
+		}
+
+		public virtual void WriteDependencies ( Stream stream ) {
+			stream.WriteValue ( DependsOn?.Length ?? 0 );
+			stream.WriteByte ( 1 ); //data type?
+			if ( DependsOn != null ) {
+				stream.WriteValuesArray ( DependsOn );
+			}
+		}
+
+		public virtual void WriteStrings ( Stream stream ) {
+			if ( MagicA != null && MagicA.Length != ExpectedStringsCount ) throw new NotSupportedException ( $"{nameof ( MagicA )} can only contain {ExpectedStringsCount} points of magic." );
+			stream.WriteValue ( ExpectedStringsCount );
+			stream.WriteValue ( MagicB?.Length ?? ExpectedMagicBCount );
+			WriteMagic ( stream , MagicA , ExpectedStringsCount , ExpectedMagicAValue );
+			WriteMagic ( stream , MagicB , ExpectedMagicBCount , ExpectedMagicBValue );
+		}
+
 		public override string ToString () {
 			return $"[{Index}] {Type} ({DependsOn.Length}) @0x{DependencyEntryOffset:X}/0x{StringsEntryOffset:X}";
+		}
+
+
+
+		private static void WriteMagic ( Stream stream , byte[] magic , int defaultAmount , byte defaultMagic ) {
+			if ( magic == null ) {
+				for ( int i = 0; i < defaultAmount; i++ ) {
+					stream.WriteByte ( defaultMagic );
+				}
+			}
+			else {
+				foreach ( var value in magic ) {
+					stream.WriteByte ( value );
+				}
+			}
+
 		}
 
 	}

@@ -6,5 +6,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct ( "SnowPakTool" )]
 [assembly: ComVisible ( false )]
 [assembly: Guid ( "491aaeb0-613a-4a27-bfcd-69c2480d13c7" )]
-[assembly: AssemblyVersion ( "1.0.0.0" )]
-[assembly: AssemblyFileVersion ( "1.0.0.0" )]
+[assembly: AssemblyInformationalVersion ( "1.1" )]
+[assembly: AssemblyVersion ( "1.1.0.0" )]
+[assembly: AssemblyFileVersion ( "1.1.0.0" )]

@@ -20,11 +20,7 @@ namespace SnowPakTool {
 		}
 
 		public static int[] ReadInt32Array ( this Stream stream , int count ) {
-			var result = new int[count];
-			for ( int i = 0; i < count; i++ ) {
-				result[i] = ReadInt32 ( stream );
-			}
-			return result;
+			return ReadValuesArray<int> ( stream , count );
 		}
 
 		public static long ReadInt64 ( this Stream stream ) {
@@ -32,11 +28,7 @@ namespace SnowPakTool {
 		}
 
 		public static long[] ReadInt64Array ( this Stream stream , int count ) {
-			var result = new long[count];
-			for ( int i = 0; i < count; i++ ) {
-				result[i] = ReadInt64 ( stream );
-			}
-			return result;
+			return ReadValuesArray<long> ( stream , count );
 		}
 
 		public static byte[] ReadByteArray ( this Stream stream , int count ) {
@@ -102,6 +94,12 @@ namespace SnowPakTool {
 			stream.Write ( buffer , 0 , sizeof ( T ) );
 		}
 
+		public static void WriteValuesArray<T> ( this Stream stream , T[] values ) where T : unmanaged {
+			for ( int i = 0; i < values.Length; i++ ) {
+				WriteValue ( stream , values[i] );
+			}
+		}
+
 		public static void ProcessChunked ( this Stream stream , int length , Action<byte[] , int> action ) {
 			const int Chunk = 65536;
 			while ( length > 0 ) {
@@ -135,7 +133,7 @@ namespace SnowPakTool {
 		public static string NormalizeDirectory ( string directory ) {
 			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
 			directory = Path.GetFullPath ( directory );
-			return directory.EndsWith ( "\\" ) ? directory : directory + '\\';
+			return directory[directory.Length - 1] == '\\' ? directory : directory + '\\';
 		}
 
 

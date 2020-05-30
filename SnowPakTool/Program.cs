@@ -12,6 +12,7 @@ namespace SnowPakTool {
 			/unpackcb "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
 			/zippak "D:\Games\SnowRunner\en_us\preload\paks\client\initial" "D:\Games\SnowRunner_backs\__mod\test.pak"
 			/listll "D:\Games\SnowRunner_backs\mods\.staging\initial-pak\pak.load_list"
+			/createll "D:\Games\SnowRunner_backs\mods\tmp\pak.load_list" "D:\Games\SnowRunner\en_us\preload\paks\client\initial.pak" "D:\Games\SnowRunner\en_us\preload\paks\client\shared.pak" "D:\Games\SnowRunner\en_us\preload\paks\client\shared_sound.pak"
 		*/
 
 		public static int Main ( string[] args ) {
@@ -41,12 +42,19 @@ namespace SnowPakTool {
 					ListLoadList ( args[1] );
 					return 0;
 
+				case "/listllc":
+					ListLoadListCompact ( args[1] );
+					return 0;
+
+				case "/createll":
+					CreateLoadList ( args[1] , args[2] , args[3] , args[4] );
+					return 0;
+
 				default:
 					PrintHelp ();
 					return 1;
 			}
 		}
-
 
 		private static void PrintLicense () {
 			using var stream = typeof ( Program ).Assembly.GetManifestResourceStream ( $"{nameof ( SnowPakTool )}.LICENSE" );
@@ -129,6 +137,34 @@ namespace SnowPakTool {
 			Console.WriteLine ( "x" );
 		}
 
+		private static void ListLoadListCompact ( string loadListLocation ) {
+			var entries = LoadListFile.ReadEntries ( loadListLocation );
+			foreach ( var item in entries ) {
+				switch ( item ) {
+					case LoadListStartEntry _:
+					case LoadListEndEntry _:
+						Console.WriteLine ( $"--{item.Type}--" );
+						break;
+					case LoadListStageEntry stage:
+						Console.WriteLine ( stage.Text );
+						break;
+					case LoadListAssetEntry asset:
+						Console.WriteLine ( asset.InternalName );
+						break;
+				}
+			}
+		}
+
+		private static void CreateLoadList ( string loadListLocation , string initialLocation , string sharedLocation , string sharedSoundLocation ) {
+			var initialContainer = FilesContainer.From ( initialLocation );
+			var sharedContainer = FilesContainer.From ( sharedLocation );
+			var sharedSoundContainer = FilesContainer.From ( sharedSoundLocation );
+			var initialContainerFiles = initialContainer.GetFiles ();
+			var sharedContainerFiles = sharedContainer.GetFiles ();
+			var sharedSoundContainerFiles = sharedSoundContainer.GetFiles ();
+			LoadListFile.WriteFileNames ( loadListLocation , initialContainerFiles , sharedContainerFiles , sharedSoundContainerFiles );
+		}
+
 		private static void PrintHelp () {
 			Console.WriteLine ( "Usage:" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /license" );
@@ -137,6 +173,8 @@ namespace SnowPakTool {
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /zippak directory file.pak" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listll pak.load_list" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listllc pak.load_list" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /createll pak.load_list initial_pak_or_directory shared_pak_or_directory shared_sound_pak_or_directory" );
 		}
 
 	}
