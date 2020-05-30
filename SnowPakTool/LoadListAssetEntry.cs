@@ -19,16 +19,24 @@ namespace SnowPakTool {
 		/// <summary>
 		/// Converts file name from the internal name format that uses angled brackets into the external name format with square brackets.
 		/// </summary>
-		public static string InternalNameToExternalName ( string name ) {
+		public static string InternalNameToExternalName ( string name , out string ps ) {
+			ps = null;
 			var match = InternalNameRegex.Match ( name );
 			if ( !match.Success ) throw new ArgumentException ( $"Unexpected internal file name format: '{name}'" , nameof ( name ) );
-			var ps = match.Groups["ps"].Value;
+			var psValue = match.Groups["ps"].Value;
 			var dir = match.Groups["dir"].Value;
 			var fn = match.Groups["fn"].Value;
-			if ( ps.IndexOfAny ( IOHelpers.InvalidNameChars ) >= 0
+			if ( psValue.IndexOfAny ( IOHelpers.InvalidNameChars ) >= 0
 						|| dir.IndexOfAny ( IOHelpers.InvalidPathChars ) >= 0
 						|| fn.IndexOfAny ( IOHelpers.InvalidNameChars ) >= 0 ) throw new ArgumentException ( $"Invalid characters found in internal name: '{name}'" , nameof ( name ) );
-			return ps.Length > 0 ? $"[{ps}]{dir}{fn}" : dir + fn;
+
+			if ( psValue.Length > 0 ) {
+				ps = psValue;
+				return $"[{psValue}]{dir}{fn}";
+			}
+			else {
+				return dir + fn;
+			}
 		}
 
 
@@ -40,10 +48,13 @@ namespace SnowPakTool {
 		public string InternalName {
 			get => m_InternalName;
 			set {
-				ExternalName = InternalNameToExternalName ( value );
+				ExternalName = InternalNameToExternalName ( value , out var ps );
+				InternalNamePs = ps;
 				m_InternalName = value;
 			}
 		}
+
+		public string InternalNamePs { get; private set; }
 
 		public string ExternalName { get; private set; }
 

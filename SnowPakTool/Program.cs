@@ -110,9 +110,21 @@ namespace SnowPakTool {
 
 			Console.WriteLine ( "\nPAKs:" );
 			var paks = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.PakName );
-			foreach ( var item in paks ) {
-				Console.WriteLine ( $"{item.Key}: {item.Count ()} asset(s)" );
+			foreach ( var pak in paks ) {
+				Console.WriteLine ( "|" );
+				Console.WriteLine ( $"+-- {pak.Key}: {pak.Count ()} asset(s)" );
+				var pss = pak.GroupBy ( a => a.InternalNamePs );
+				foreach ( var ps in pss ) {
+					Console.WriteLine ( $"|   +-- <{ps.Key}>: {ps.Count ()}" );
+					var psLoaders = ps.GroupBy ( a => a.Loader );
+					foreach ( var loader in psLoaders ) {
+						Console.WriteLine ( $"|   |   +-- {loader.Key}: {loader.Count ()}" );
+					}
+					Console.WriteLine ( "|   |" );
+				}
+				Console.WriteLine ( "|   x" );
 			}
+			Console.WriteLine ( "x" );
 		}
 
 		private static void PrintHelp () {
