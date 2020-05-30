@@ -46,28 +46,28 @@ namespace SnowPakTool {
 			for ( int i = 0; i < entriesCount; i++ ) {
 				var entry = entries[i] = LoadListEntryBase.FromType ( entryTypes[i] );
 				entry.Index = i;
-				entry.OrderEntryOffset = stream.Position;
+				entry.DependencyEntryOffset = stream.Position;
 				var count = stream.ReadInt32 ();
 				stream.ReadMagicByte ( 1 ); //data type?
 				entry.DependsOn = stream.ReadInt32Array ( count );
-				if ( entry.DependsOn.Any ( a => a < 0 && a >= entriesCount ) ) throw new InvalidDataException ( $"Invalid dependency index for entry {i} @0x{entry.OrderEntryOffset:X}." );
+				if ( entry.DependsOn.Any ( a => a < 0 && a >= entriesCount ) ) throw new InvalidDataException ( $"Invalid dependency index for entry {i} @0x{entry.DependencyEntryOffset:X}." );
 			}
 
 			stream.ReadMagicByte ( 1 ); //???
 
 			for ( int i = 0; i < entriesCount; i++ ) {
 				var entry = entries[i];
-				entry.NamesEntryOffset = stream.Position;
+				entry.StringsEntryOffset = stream.Position;
 
 				var stringsCount = stream.ReadInt32 ();
 				var magicBCount = stream.ReadInt32 ();
 				entry.MagicA = stream.ReadByteArray ( stringsCount );
 				entry.MagicB = stream.ReadByteArray ( magicBCount );
 
-				if ( stringsCount != entry.ExpectedStringsCount ) throw new InvalidDataException ( $"Unexpected strings count for entry {i} @0x{entry.NamesEntryOffset:X}." );
-				if ( magicBCount != 2 ) throw new InvalidDataException ( $"Unexpected length of magic array 'B' for entry {i} @0x{entry.NamesEntryOffset:X}." );
-				if ( entry.MagicA.Any ( a => a != 1 ) ) throw new InvalidDataException ( $"Unknown value in magic array 'A' for entry {i} @0x{entry.NamesEntryOffset:X}." );
-				if ( entry.MagicB.Any ( a => a != 1 ) ) throw new InvalidDataException ( $"Unknown value in magic array 'B' for entry {i} @0x{entry.NamesEntryOffset:X}." );
+				if ( stringsCount != entry.ExpectedStringsCount ) throw new InvalidDataException ( $"Unexpected strings count for entry {i} @0x{entry.StringsEntryOffset:X}." );
+				if ( magicBCount != 2 ) throw new InvalidDataException ( $"Unexpected length of magic array 'B' for entry {i} @0x{entry.StringsEntryOffset:X}." );
+				if ( entry.MagicA.Any ( a => a != 1 ) ) throw new InvalidDataException ( $"Unknown value in magic array 'A' for entry {i} @0x{entry.StringsEntryOffset:X}." );
+				if ( entry.MagicB.Any ( a => a != 1 ) ) throw new InvalidDataException ( $"Unknown value in magic array 'B' for entry {i} @0x{entry.StringsEntryOffset:X}." );
 
 				if ( entry is LoadListStageEntry stage ) {
 					stage.Text = stream.ReadLength32String ();

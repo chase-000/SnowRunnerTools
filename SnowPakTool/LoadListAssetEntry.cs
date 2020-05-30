@@ -63,7 +63,7 @@ namespace SnowPakTool {
 		public string PakName { get; set; }
 
 		public override string ToString () {
-			return $"[{Index}] [{PakName}] {InternalName} ({Loader}) ({DependsOn.Length}) @0x{OrderEntryOffset:X}/0x{NamesEntryOffset:X}";
+			return $"[{Index}] [{PakName}] {InternalName} ({Loader}) ({DependsOn.Length}) @0x{DependencyEntryOffset:X}/0x{StringsEntryOffset:X}";
 		}
 
 	}
