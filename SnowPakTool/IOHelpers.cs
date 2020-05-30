@@ -100,11 +100,11 @@ namespace SnowPakTool {
 			}
 		}
 
-		public static void ProcessChunked ( this Stream stream , int length , Action<byte[] , int> action ) {
+		public static void ProcessChunked ( this Stream stream , long length , Action<byte[] , int> action ) {
 			const int Chunk = 65536;
 			while ( length > 0 ) {
 				var buffer = GetBuffer ( Chunk );
-				var read = stream.Read ( buffer , 0 , Math.Min ( length , Chunk ) );
+				var read = stream.Read ( buffer , 0 , (int) Math.Min ( length , Chunk ) );
 				if ( read == 0 ) throw new EndOfStreamException ();
 				action ( buffer , read );
 				length -= read;

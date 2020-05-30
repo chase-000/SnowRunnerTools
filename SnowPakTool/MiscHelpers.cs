@@ -12,8 +12,18 @@ namespace SnowPakTool {
 
 
 		public static int EnsureFitsInt32 ( long value ) {
-			if ( value > int.MaxValue ) throw new NotSupportedException ( $"Value exceeds {int.MaxValue}." );
+			if ( value > int.MaxValue ) throw new ArgumentOutOfRangeException ( nameof ( value ) , $"Value exceeds {int.MaxValue}." );
 			return (int) value;
+		}
+
+		public static uint EnsureFitsUInt32 ( long value ) {
+			if ( value > uint.MaxValue ) throw new ArgumentOutOfRangeException ( nameof ( value ) , $"Value exceeds {uint.MaxValue}." );
+			return (uint) value;
+		}
+
+		public static ushort EnsureFitsUInt16 ( int value ) {
+			if ( value > ushort.MaxValue ) throw new ArgumentOutOfRangeException ( nameof ( value ) , $"Value exceeds {ushort.MaxValue}." );
+			return (ushort) value;
 		}
 
 		internal static void Assert ( bool value ) {

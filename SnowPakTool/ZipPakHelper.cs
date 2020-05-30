@@ -68,17 +68,18 @@ namespace SnowPakTool {
 		}
 
 		private static void StoreFiles ( Stream zipStream , string baseLocation , params string[] files ) {
-			var localEntries = new LocalFileHeader[files.Length];
-			var relativeNames = new byte[files.Length][];
-			var offsets = new long[files.Length];
+			var count = MiscHelpers.EnsureFitsUInt16 ( files.Length );
+			var localEntries = new LocalFileHeader[count];
+			var relativeNames = new byte[count][];
+			var offsets = new long[count];
 
 			//local entries and actual data
-			for ( int i = 0; i < files.Length; i++ ) {
+			for ( int i = 0; i < count; i++ ) {
 				offsets[i] = zipStream.Position;
 				var location = files[i];
 				var relativeName = location.Substring ( baseLocation.Length );
 				using ( var sourceStream = File.OpenRead ( location ) ) {
-					var size = MiscHelpers.EnsureFitsInt32 ( sourceStream.Length );
+					var size = MiscHelpers.EnsureFitsUInt32 ( sourceStream.Length );
 					var relativeNameBytes = relativeNames[i] = MiscHelpers.Encoding.GetBytes ( relativeName );
 					var lfh = localEntries[i] = new LocalFileHeader {
 						VersionNeeded = ZipVersion ,
@@ -89,7 +90,7 @@ namespace SnowPakTool {
 						Crc32 = ComputeCrc32 ( sourceStream , size ) ,
 						CompressedSize = size ,
 						UncompressedSize = size ,
-						NameLength = (short) relativeNameBytes.Length ,
+						NameLength = MiscHelpers.EnsureFitsUInt16 ( relativeNameBytes.Length ) ,
 						ExtraLength = 0 ,
 					};
 					zipStream.WriteValue ( LocalFileHeader.DefaultSignature );
@@ -102,11 +103,11 @@ namespace SnowPakTool {
 			}
 
 			//central directory entries
-			var centralDirectoryStart = MiscHelpers.EnsureFitsInt32 ( zipStream.Position );
-			for ( int i = 0; i < files.Length; i++ ) {
+			var centralDirectoryStart = MiscHelpers.EnsureFitsUInt32 ( zipStream.Position );
+			for ( int i = 0; i < count; i++ ) {
 				var lfh = localEntries[i];
 				var cdfh = new CentralDirectoryFileHeader ( lfh ) {
-					LocalOffset = MiscHelpers.EnsureFitsInt32 ( offsets[i] ) ,
+					LocalOffset = MiscHelpers.EnsureFitsUInt32 ( offsets[i] ) ,
 				};
 				zipStream.WriteValue ( CentralDirectoryFileHeader.DefaultSignature );
 				zipStream.WriteValue ( cdfh );
@@ -115,12 +116,12 @@ namespace SnowPakTool {
 			}
 
 			//central directory end
-			var centralDirectoryEnd = MiscHelpers.EnsureFitsInt32 ( zipStream.Position );
+			var centralDirectoryEnd = MiscHelpers.EnsureFitsUInt32 ( zipStream.Position );
 			var eocd = new EndOfCentralDirectory {
 				DiskNumber = 0 ,
 				CentralDirectoryDiskNumber = 0 ,
-				DiskRecords = (short) files.Length ,
-				TotalRecords = (short) files.Length ,
+				DiskRecords = count ,
+				TotalRecords = count ,
 				CentralDirectorySize = centralDirectoryEnd - centralDirectoryStart ,
 				CentralDirectoryOffset = centralDirectoryStart ,
 				CommentLength = 0 ,
@@ -129,7 +130,7 @@ namespace SnowPakTool {
 			zipStream.WriteValue ( eocd );
 		}
 
-		public static int ComputeCrc32 ( this Stream stream , int length ) {
+		public static int ComputeCrc32 ( this Stream stream , long length ) {
 			using var hasher = new Crc32Managed ();
 			stream.ProcessChunked ( length , ( buffer , read ) => hasher.TransformBlock ( buffer , 0 , read , buffer , 0 ) );
 			hasher.TransformFinalBlock ( __DummyBuffer , 0 , 0 );
@@ -144,16 +145,16 @@ namespace SnowPakTool {
 
 			public const int DefaultSignature = 0x04034B50;
 
-			public short VersionNeeded;
-			public short Flags;
-			public short Compression;
-			public short Time;
-			public short Date;
+			public ushort VersionNeeded;
+			public ushort Flags;
+			public ushort Compression;
+			public ushort Time;
+			public ushort Date;
 			public int Crc32;
-			public int CompressedSize;
-			public int UncompressedSize;
-			public short NameLength;
-			public short ExtraLength;
+			public uint CompressedSize;
+			public uint UncompressedSize;
+			public ushort NameLength;
+			public ushort ExtraLength;
 
 		}
 
@@ -163,22 +164,22 @@ namespace SnowPakTool {
 
 			public const int DefaultSignature = 0x02014B50;
 
-			public short VersionMadeBy;
-			public short VersionNeeded;
-			public short Flags;
-			public short Compression;
-			public short Time;
-			public short Date;
+			public ushort VersionMadeBy;
+			public ushort VersionNeeded;
+			public ushort Flags;
+			public ushort Compression;
+			public ushort Time;
+			public ushort Date;
 			public int Crc32;
-			public int CompressedSize;
-			public int UncompressedSize;
-			public short NameLength;
-			public short ExtraLength;
-			public short CommentLength;
-			public short DiskNumber;
-			public short InternalAttributes;
-			public int ExternalAttributes;
-			public int LocalOffset;
+			public uint CompressedSize;
+			public uint UncompressedSize;
+			public ushort NameLength;
+			public ushort ExtraLength;
+			public ushort CommentLength;
+			public ushort DiskNumber;
+			public ushort InternalAttributes;
+			public uint ExternalAttributes;
+			public uint LocalOffset;
 
 			public CentralDirectoryFileHeader ( LocalFileHeader header ) {
 				VersionMadeBy = header.VersionNeeded;
@@ -207,13 +208,13 @@ namespace SnowPakTool {
 
 			public const int DefaultSignature = 0x06054B50;
 
-			public short DiskNumber;
-			public short CentralDirectoryDiskNumber;
-			public short DiskRecords;
-			public short TotalRecords;
-			public int CentralDirectorySize;
-			public int CentralDirectoryOffset;
-			public short CommentLength;
+			public ushort DiskNumber;
+			public ushort CentralDirectoryDiskNumber;
+			public ushort DiskRecords;
+			public ushort TotalRecords;
+			public uint CentralDirectorySize;
+			public uint CentralDirectoryOffset;
+			public ushort CommentLength;
 
 		}
 
