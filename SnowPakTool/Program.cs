@@ -96,15 +96,15 @@ namespace SnowPakTool {
 			}
 
 			Console.WriteLine ( "\nLoaders:" );
-			var loaders = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.Loader ).Select ( a => a.Key ).ToList ();
+			var loaders = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.Loader );
 			foreach ( var item in loaders ) {
-				Console.WriteLine ( item );
+				Console.WriteLine ( $"{item.Key}: {item.Count ()} asset(s)" );
 			}
 
 			Console.WriteLine ( "\nPAKs:" );
-			var paks = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.PakName ).Select ( a => a.Key ).ToList ();
+			var paks = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.PakName );
 			foreach ( var item in paks ) {
-				Console.WriteLine ( item );
+				Console.WriteLine ( $"{item.Key}: {item.Count ()} asset(s)" );
 			}
 		}
 
