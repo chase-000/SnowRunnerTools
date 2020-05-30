@@ -95,6 +95,12 @@ namespace SnowPakTool {
 				Console.WriteLine ( item );
 			}
 
+			Console.WriteLine ( "\nStages:" );
+			var stages = entries.OfType<LoadListStageEntry> ();
+			foreach ( var item in stages ) {
+				Console.WriteLine ( $"[{item.Index}] {item.Text}" );
+			}
+
 			Console.WriteLine ( "\nLoaders:" );
 			var loaders = entries.OfType<LoadListAssetEntry> ().GroupBy ( a => a.Loader );
 			foreach ( var item in loaders ) {
