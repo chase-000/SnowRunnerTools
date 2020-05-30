@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
@@ -31,7 +30,7 @@ namespace SnowPakTool {
 
 			using ( var zipStream = File.Open ( pakLocation , FileMode.CreateNew , FileAccess.ReadWrite , FileShare.None ) ) {
 				if ( loadListExists ) {
-					WriteListFile ( zipStream , listLocation );
+					WriteListFile ( zipStream , sourceDirectory , listLocation );
 				}
 				using ( var zip = new ZipArchive ( zipStream , ZipArchiveMode.Update ) ) {
 					AddFiles ( zip , sourceDirectory );
@@ -64,64 +63,69 @@ namespace SnowPakTool {
 		/// <remarks>
 		/// <see cref="ZipArchive"/> does not support real store (0) method and uses deflate instead, so it's written here manually.
 		/// </remarks>
-		private static void WriteListFile ( Stream zipStream , string listLocation ) {
-			using var listStream = File.OpenRead ( listLocation );
-			var size = MiscHelpers.EnsureFitsInt32 ( listStream.Length );
-			var nameBytes = MiscHelpers.Encoding.GetBytes ( LoadListName );
+		private static void WriteListFile ( Stream zipStream , string baseLocation , string listLocation ) {
+			StoreFiles ( zipStream , baseLocation , listLocation );
+		}
 
-			var lfh = new LocalFileHeader {
-				Signature = LocalFileHeader.DefaultSignature ,
-				Version = ZipVersion ,
-				Flags = 0 ,
-				Compression = 0 ,
-				Time = 0 ,
-				Date = 0 ,
-				Crc32 = ComputeCrc32 ( listStream , size ) ,
-				CompressedSize = size ,
-				UncompressedSize = size ,
-				NameLength = (short) nameBytes.Length ,
-				ExtraLength = 0 ,
-			};
-			zipStream.WriteValue ( lfh );
-			zipStream.Write ( nameBytes , 0 , nameBytes.Length );
+		private static void StoreFiles ( Stream zipStream , string baseLocation , params string[] files ) {
+			var localEntries = new LocalFileHeader[files.Length];
+			var relativeNames = new byte[files.Length][];
+			var offsets = new long[files.Length];
 
-			listStream.Position = 0;
-			listStream.CopyTo ( zipStream );
+			//local entries and actual data
+			for ( int i = 0; i < files.Length; i++ ) {
+				offsets[i] = zipStream.Position;
+				var location = files[i];
+				var relativeName = location.Substring ( baseLocation.Length );
+				using ( var sourceStream = File.OpenRead ( location ) ) {
+					var size = MiscHelpers.EnsureFitsInt32 ( sourceStream.Length );
+					var relativeNameBytes = relativeNames[i] = MiscHelpers.Encoding.GetBytes ( relativeName );
+					var lfh = localEntries[i] = new LocalFileHeader {
+						Version = ZipVersion ,
+						Flags = 0 ,
+						Compression = 0 ,
+						Time = 0 ,
+						Date = 0 ,
+						Crc32 = ComputeCrc32 ( sourceStream , size ) ,
+						CompressedSize = size ,
+						UncompressedSize = size ,
+						NameLength = (short) relativeNameBytes.Length ,
+						ExtraLength = 0 ,
+					};
+					zipStream.WriteValue ( LocalFileHeader.DefaultSignature );
+					zipStream.WriteValue ( lfh );
+					zipStream.Write ( relativeNameBytes , 0 , relativeNameBytes.Length );
 
+					sourceStream.Position = 0;
+					sourceStream.CopyTo ( zipStream );
+				}
+			}
+
+			//central directory entries
 			var centralDirectoryStart = MiscHelpers.EnsureFitsInt32 ( zipStream.Position );
-			var cdfh = new CentralDirectoryFileHeader {
-				Signature = CentralDirectoryFileHeader.DefaultSignature ,
-				Version = ZipVersion ,
-				VersionNeeded = ZipVersion ,
-				Flags = 0 ,
-				Compression = 0 ,
-				Time = 0 ,
-				Date = 0 ,
-				Crc32 = lfh.Crc32 ,
-				CompressedSize = size ,
-				UncompressedSize = size ,
-				NameLength = (short) nameBytes.Length ,
-				ExtraLength = 0 ,
-				CommentLength = 0 ,
-				DiskNumber = 0 ,
-				InternalAttributes = 0 ,
-				ExternalAttributes = 0 ,
-				LocalOffset = 0 ,
-			};
-			zipStream.WriteValue ( cdfh );
-			zipStream.Write ( nameBytes , 0 , nameBytes.Length );
+			for ( int i = 0; i < files.Length; i++ ) {
+				var lfh = localEntries[i];
+				var cdfh = new CentralDirectoryFileHeader ( lfh ) {
+					LocalOffset = MiscHelpers.EnsureFitsInt32 ( offsets[i] ) ,
+				};
+				zipStream.WriteValue ( CentralDirectoryFileHeader.DefaultSignature );
+				zipStream.WriteValue ( cdfh );
+				var nameBytes = relativeNames[i];
+				zipStream.Write ( nameBytes , 0 , nameBytes.Length );
+			}
 
+			//central directory end
 			var centralDirectoryEnd = MiscHelpers.EnsureFitsInt32 ( zipStream.Position );
 			var eocd = new EndOfCentralDirectory {
-				Signature = EndOfCentralDirectory.DefaultSignature ,
 				DiskNumber = 0 ,
 				CentralDirectoryDiskNumber = 0 ,
-				DiskRecords = 1 ,
-				TotalRecords = 1 ,
+				DiskRecords = (short) files.Length ,
+				TotalRecords = (short) files.Length ,
 				CentralDirectorySize = centralDirectoryEnd - centralDirectoryStart ,
 				CentralDirectoryOffset = centralDirectoryStart ,
 				CommentLength = 0 ,
 			};
+			zipStream.WriteValue ( EndOfCentralDirectory.DefaultSignature );
 			zipStream.WriteValue ( eocd );
 		}
 
@@ -133,10 +137,13 @@ namespace SnowPakTool {
 		}
 
 
+
+
 		[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-		private struct LocalFileHeader {
+		public struct LocalFileHeader {
+
 			public const int DefaultSignature = 0x04034B50;
-			public int Signature;
+
 			public short Version;
 			public short Flags;
 			public short Compression;
@@ -147,12 +154,15 @@ namespace SnowPakTool {
 			public int UncompressedSize;
 			public short NameLength;
 			public short ExtraLength;
+
 		}
 
+
 		[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-		private struct CentralDirectoryFileHeader {
+		public struct CentralDirectoryFileHeader {
+
 			public const int DefaultSignature = 0x02014B50;
-			public int Signature;
+
 			public short Version;
 			public short VersionNeeded;
 			public short Flags;
@@ -169,12 +179,34 @@ namespace SnowPakTool {
 			public short InternalAttributes;
 			public int ExternalAttributes;
 			public int LocalOffset;
+
+			public CentralDirectoryFileHeader ( LocalFileHeader header ) {
+				Version = header.Version;
+				VersionNeeded = header.Version;
+				Flags = header.Flags;
+				Compression = header.Compression;
+				Time = header.Time;
+				Date = header.Date;
+				Crc32 = header.Crc32;
+				CompressedSize = header.CompressedSize;
+				UncompressedSize = header.UncompressedSize;
+				NameLength = header.NameLength;
+				ExtraLength = 0;
+				CommentLength = 0;
+				DiskNumber = 0;
+				InternalAttributes = 0;
+				ExternalAttributes = 0;
+				LocalOffset = 0;
+			}
+
 		}
 
+
 		[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-		private struct EndOfCentralDirectory {
+		public struct EndOfCentralDirectory {
+
 			public const int DefaultSignature = 0x06054B50;
-			public int Signature;
+
 			public short DiskNumber;
 			public short CentralDirectoryDiskNumber;
 			public short DiskRecords;
@@ -182,6 +214,7 @@ namespace SnowPakTool {
 			public int CentralDirectorySize;
 			public int CentralDirectoryOffset;
 			public short CommentLength;
+
 		}
 
 	}
