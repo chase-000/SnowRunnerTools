@@ -17,15 +17,21 @@ namespace SnowPakTool {
 			if ( sourceDirectory is null ) throw new ArgumentNullException ( nameof ( sourceDirectory ) );
 			if ( pakLocation is null ) throw new ArgumentNullException ( nameof ( pakLocation ) );
 
+			Console.WriteLine ( "Preparing ordered zip file..." );
+
 			sourceDirectory = IOHelpers.NormalizeDirectory ( sourceDirectory );
 			if ( !Directory.Exists ( sourceDirectory ) ) throw new IOException ( $"Source directory '{sourceDirectory}' does not exist." );
 
 			var listLocation = Path.Combine ( sourceDirectory , LoadListName );
-			if ( !File.Exists ( listLocation ) ) throw new IOException ( $"List file '{listLocation}' does not exist." );
+			var loadListExists = File.Exists ( listLocation );
+			if ( !loadListExists ) {
+				Console.WriteLine ( $"WARNING: List file '{listLocation}' does not exist." );
+			}
 
-			Console.WriteLine ( "Preparing ordered zip file..." );
 			using ( var zipStream = File.Open ( pakLocation , FileMode.CreateNew , FileAccess.ReadWrite , FileShare.None ) ) {
-				WriteListFile ( zipStream , listLocation );
+				if ( loadListExists ) {
+					WriteListFile ( zipStream , listLocation );
+				}
 				using ( var zip = new ZipArchive ( zipStream , ZipArchiveMode.Update ) ) {
 					AddFiles ( zip , sourceDirectory );
 					Console.WriteLine ( "Compressing..." );
