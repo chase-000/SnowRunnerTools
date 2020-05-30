@@ -5,9 +5,6 @@ namespace SnowPakTool {
 
 	public class LoadListAssetEntry : LoadListEntryBase {
 
-		private string m_InternalName;
-
-
 		/// <summary>
 		/// Regex used to parse internal file names.
 		/// </summary>
@@ -40,27 +37,14 @@ namespace SnowPakTool {
 		}
 
 
-
 		public override LoadListEntryType Type => LoadListEntryType.Asset;
-
 		public override int ExpectedStringsCount => 3;
-
-		public string InternalName {
-			get => m_InternalName;
-			set {
-				ExternalName = InternalNameToExternalName ( value , out var ps );
-				InternalNamePs = ps;
-				m_InternalName = value;
-			}
-		}
-
-		public string InternalNamePs { get; private set; }
-
-		public string ExternalName { get; private set; }
-
+		public string InternalName { get; set; }
+		public string InternalNamePs { get; set; }
+		public string ExternalName { get; set; }
 		public string Loader { get; set; }
-
 		public string PakName { get; set; }
+
 
 		public override string ToString () {
 			return $"[{Index}] [{PakName}] {InternalName} ({Loader}) ({DependsOn.Length}) @0x{DependencyEntryOffset:X}/0x{StringsEntryOffset:X}";

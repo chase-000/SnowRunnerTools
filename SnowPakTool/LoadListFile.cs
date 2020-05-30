@@ -74,6 +74,8 @@ namespace SnowPakTool {
 				}
 				else if ( entry is LoadListAssetEntry asset ) {
 					asset.InternalName = stream.ReadLength32String ();
+					asset.ExternalName = LoadListAssetEntry.InternalNameToExternalName ( asset.InternalName , out var ps );
+					asset.InternalNamePs = ps;
 					asset.Loader = stream.ReadLength32String ();
 					asset.PakName = stream.ReadLength32String ();
 				}
