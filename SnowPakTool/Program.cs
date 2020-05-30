@@ -38,7 +38,7 @@ namespace SnowPakTool {
 					return 0;
 
 				case "/listll":
-					LoadListTest ( args[1] );
+					ListLoadList ( args[1] );
 					return 0;
 
 				default:
@@ -90,11 +90,13 @@ namespace SnowPakTool {
 			}
 		}
 
-		private static void LoadListTest ( string loadListLocation ) {
+		private static void ListLoadList ( string loadListLocation ) {
 			var entries = LoadListFile.ReadEntries ( loadListLocation );
 			foreach ( var item in entries ) {
 				Console.WriteLine ( item );
 			}
+
+			LoadListFile.ValidateLoadListOrdering ( entries );
 
 			Console.WriteLine ( "\nStages:" );
 			var stages = entries.OfType<LoadListStageEntry> ();

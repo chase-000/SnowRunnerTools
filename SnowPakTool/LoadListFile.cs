@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -81,6 +82,58 @@ namespace SnowPakTool {
 			if ( stream.Position != stream.Length ) throw new InvalidDataException ( "Data found beyond logical end of file." );
 
 			return entries;
+		}
+
+		/// <summary>
+		/// Validates that the entry dependencies are in expected order.
+		/// </summary>
+		public static void ValidateLoadListOrdering ( IReadOnlyList<LoadListEntryBase> entries ) {
+			Console.WriteLine ( "\nValidating load list dependencies order:" );
+			var lastGroup = -1;
+			for ( int i = 0; i < entries.Count; i++ ) {
+				var entry = entries[i];
+				if ( lastGroup < 0 ) {
+					if ( entry.DependsOn.Length > 0 ) {
+						Console.WriteLine ( "[0] Start entry has dependencies." );
+					}
+					lastGroup = i;
+					continue;
+				}
+
+				var orderedDependsOn = entry.DependsOn.OrderBy ( a => a ).ToList ();
+				if ( !entry.DependsOn.SequenceEqual ( orderedDependsOn ) ) {
+					Console.WriteLine ( $"[{i}] Dependencies list is not sorted." );
+				}
+
+				switch ( entries[i] ) {
+					case LoadListAssetEntry _:
+						if ( entry.DependsOn.Length == 0 ) {
+							Console.WriteLine ( $"[{i}] Asset has no dependencies." );
+						}
+						if ( entry.DependsOn.Length > 1 ) {
+							Console.WriteLine ( $"[{i}] Asset has more than one dependency." );
+						}
+						break;
+
+					case LoadListEndEntry _:
+					case LoadListStageEntry _:
+						if ( i - lastGroup > 1 ) {
+							if ( !Enumerable.Range ( lastGroup + 1 , i - lastGroup - 1 ).SequenceEqual ( orderedDependsOn ) ) {
+								Console.WriteLine ( $"[{i}] Stage doesn't depend on previous assets exactly." );
+							}
+						}
+						else {
+							if ( entry.DependsOn.Length == 0 ) {
+								Console.WriteLine ( $"[{i}] Stage has no dependencies." );
+							}
+							if ( entry.DependsOn.Length > 1 ) {
+								Console.WriteLine ( $"[{i}] Stage depends on more than immediately preceding stage." );
+							}
+						}
+						lastGroup = i;
+						break;
+				}
+			}
 		}
 
 	}
