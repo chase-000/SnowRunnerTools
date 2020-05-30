@@ -7,6 +7,7 @@ namespace SnowPakTool {
 	public static class Program {
 
 		/*
+			/listcb "D:\Games\SnowRunner_backs\mods\tmp\initial.cache_block"
 			/packcb "D:\Games\SnowRunner_backs\settings\keys\tmp" "D:\Games\SnowRunner_backs\settings\keys\initial.1.cache_block"
 			/unpackcb "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
 			/zippak "D:\Games\SnowRunner\en_us\preload\paks\client\initial" "D:\Games\SnowRunner_backs\__mod\test.pak"

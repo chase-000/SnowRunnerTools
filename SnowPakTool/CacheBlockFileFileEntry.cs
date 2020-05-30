@@ -12,6 +12,10 @@ namespace SnowPakTool {
 		/// <summary>
 		/// Regex used to parse internal file names.
 		/// </summary>
+		/// <remarks>
+		/// This format differs slightly from the one in <see cref="LoadListAssetEntry"/> in that it uses ':' in place of an empty directory name.
+		/// It's also unclear what it looks like (or even if it allows) for file names that don't have PS-part, so that's not supported here.
+		/// </remarks>
 		public static Regex InternalNameRegex { get; } = new Regex ( @"^<(?<ps>[^>]+)>(?:(?<dir>\\.+\\)|:)(?<fn>[^\\]+)$" , RegexOptions.Compiled );
 
 
