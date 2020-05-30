@@ -67,6 +67,7 @@
     <Compile Include="LoadListStageEntry.cs" />
     <Compile Include="LoadListStartEntry.cs" />
     <Compile Include="MiscHelpers.cs" />
+    <Compile Include="PakableFileNameComparer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZipArchiveFilesContainer.cs" />
