@@ -55,7 +55,7 @@
     <Compile Include="CacheBlockReader.cs" />
     <Compile Include="CacheBlockWriter.cs" />
     <Compile Include="Crc32Managed.cs" />
-    <Compile Include="FileEntry.cs" />
+    <Compile Include="CacheBlockFileFileEntry.cs" />
     <Compile Include="IOHelpers.cs" />
     <Compile Include="LoadListAssetEntry.cs" />
     <Compile Include="LoadListEndEntry.cs" />

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace SnowPakTool {
 
 	[DebuggerDisplay ( "{InternalName}: {Size} @ {RelativeOffset}" )]
-	public class FileEntry {
+	public class CacheBlockFileFileEntry {
 
 		/// <summary>
 		/// Regex used to parse internal file names.
@@ -15,17 +15,17 @@ namespace SnowPakTool {
 		public static Regex InternalNameRegex { get; } = new Regex ( @"^<(?<ps>[^>]+)>(?:(?<dir>\\.+\\)|:)(?<fn>[^\\]+)$" , RegexOptions.Compiled );
 
 
-		public static FileEntry FromInternalName ( string name ) {
+		public static CacheBlockFileFileEntry FromInternalName ( string name ) {
 			if ( name is null ) throw new ArgumentNullException ( nameof ( name ) );
-			return new FileEntry {
+			return new CacheBlockFileFileEntry {
 				InternalName = name ,
 				ExternalName = InternalNameToExternalName ( name ) ,
 			};
 		}
 
-		public static FileEntry FromExternalName ( string name ) {
+		public static CacheBlockFileFileEntry FromExternalName ( string name ) {
 			if ( name is null ) throw new ArgumentNullException ( nameof ( name ) );
-			return new FileEntry {
+			return new CacheBlockFileFileEntry {
 				ExternalName = name ,
 				InternalName = ExternalNameToInternalName ( name ) ,
 			};
@@ -76,7 +76,7 @@ namespace SnowPakTool {
 		public int Zero { get; set; }
 
 
-		private FileEntry () {
+		private CacheBlockFileFileEntry () {
 		}
 
 	}

@@ -10,18 +10,18 @@ namespace SnowPakTool {
 		public CacheBlockWriter ( Stream stream ) : base ( stream ) {
 		}
 
-		public static IEnumerable<FileEntry> GetFileEntries ( string directory ) {
+		public static IEnumerable<CacheBlockFileFileEntry> GetFileEntries ( string directory ) {
 			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
 			directory = IOHelpers.NormalizeDirectory ( directory );
 			if ( !Directory.Exists ( directory ) ) throw new IOException ( $"Source directory '{directory}' does not exist." );
 			if ( Directory.EnumerateFiles ( directory , "*" ).Any () ) throw new IOException ( $"Source directory '{directory}' has files in it. It should only contain directories." );
 			return Directory
 				.EnumerateFiles ( directory , "*" , SearchOption.AllDirectories )
-				.Select ( a => FileEntry.FromExternalName ( a.Substring ( directory.Length ) ) )
+				.Select ( a => CacheBlockFileFileEntry.FromExternalName ( a.Substring ( directory.Length ) ) )
 				;
 		}
 
-		public void Pack ( string sourceDirectory , IReadOnlyCollection<FileEntry> entries ) {
+		public void Pack ( string sourceDirectory , IReadOnlyCollection<CacheBlockFileFileEntry> entries ) {
 			if ( sourceDirectory is null ) throw new ArgumentNullException ( nameof ( sourceDirectory ) );
 			if ( entries is null ) throw new ArgumentNullException ( nameof ( entries ) );
 			WriteHeader ( entries.Count );
@@ -30,7 +30,7 @@ namespace SnowPakTool {
 			WriteOffsetsSizesZeroesAndData ( sourceDirectory , entries );
 		}
 
-		private void WriteOffsetsSizesZeroesAndData ( string sourceDirectory , IReadOnlyCollection<FileEntry> entries ) {
+		private void WriteOffsetsSizesZeroesAndData ( string sourceDirectory , IReadOnlyCollection<CacheBlockFileFileEntry> entries ) {
 			var offsetsPosition = Stream.Position;
 
 			Stream.Position = offsetsPosition + 8L * entries.Count;
@@ -66,7 +66,7 @@ namespace SnowPakTool {
 			Console.WriteLine ();
 		}
 
-		private void WriteNamesTable ( IReadOnlyCollection<FileEntry> entries ) {
+		private void WriteNamesTable ( IReadOnlyCollection<CacheBlockFileFileEntry> entries ) {
 			foreach ( var item in entries ) {
 				Stream.WriteLength32String ( item.InternalName );
 			}

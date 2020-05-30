@@ -29,7 +29,7 @@ namespace SnowPakTool {
 
 
 		public Stream Stream { get; }
-		public FileEntry[] FileEntries { get; protected set; }
+		public CacheBlockFileFileEntry[] FileEntries { get; protected set; }
 		public long BaseOffset { get; protected set; }
 
 	}

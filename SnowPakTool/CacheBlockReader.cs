@@ -9,7 +9,7 @@ namespace SnowPakTool {
 
 		public CacheBlockReader ( Stream stream ) : base ( stream ) {
 			var count = ReadHeader ();
-			FileEntries = new FileEntry[count];
+			FileEntries = new CacheBlockFileFileEntry[count];
 			ReadFileEntries ();
 			BaseOffset = stream.Position;
 		}
@@ -19,7 +19,7 @@ namespace SnowPakTool {
 			Unpack ( targetDirectory , FileEntries );
 		}
 
-		public void Unpack ( string targetDirectory , IReadOnlyCollection<FileEntry> entries ) {
+		public void Unpack ( string targetDirectory , IReadOnlyCollection<CacheBlockFileFileEntry> entries ) {
 			var i = 0;
 			foreach ( var item in entries ) {
 				i++;
@@ -60,7 +60,7 @@ namespace SnowPakTool {
 		private void ReadNames () {
 			for ( int i = 0; i < FileEntries.Length; i++ ) {
 				var name = Stream.ReadLength32String ();
-				FileEntries[i] = FileEntry.FromInternalName ( name );
+				FileEntries[i] = CacheBlockFileFileEntry.FromInternalName ( name );
 			}
 		}
 
