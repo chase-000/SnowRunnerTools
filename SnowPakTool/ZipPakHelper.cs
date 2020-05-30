@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
@@ -43,10 +44,10 @@ namespace SnowPakTool {
 
 		private static void AddFiles ( ZipArchive zip , string sourceDirectory ) {
 			var files = Directory.GetFiles ( sourceDirectory , "*" , SearchOption.AllDirectories );
-			var i = 0;
 			var skipped = false;
-			foreach ( var location in Directory.EnumerateFiles ( sourceDirectory , "*" , SearchOption.AllDirectories ) ) {
-				Console.Write ( $"\rAdding file {++i}/{files.Length}" );
+			for ( int i = 0; i < files.Length; i++ ) {
+				var location = files[i];
+				Console.Write ( $"\rAdding file {i + 1}/{files.Length}" );
 				var relativeName = location.Substring ( sourceDirectory.Length );
 				if ( !skipped && relativeName.Equals ( LoadListName , StringComparison.OrdinalIgnoreCase ) ) {
 					skipped = true;
