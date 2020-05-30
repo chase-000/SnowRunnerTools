@@ -81,7 +81,7 @@ namespace SnowPakTool {
 					var size = MiscHelpers.EnsureFitsInt32 ( sourceStream.Length );
 					var relativeNameBytes = relativeNames[i] = MiscHelpers.Encoding.GetBytes ( relativeName );
 					var lfh = localEntries[i] = new LocalFileHeader {
-						Version = ZipVersion ,
+						VersionNeeded = ZipVersion ,
 						Flags = 0 ,
 						Compression = 0 ,
 						Time = 0 ,
@@ -144,7 +144,7 @@ namespace SnowPakTool {
 
 			public const int DefaultSignature = 0x04034B50;
 
-			public short Version;
+			public short VersionNeeded;
 			public short Flags;
 			public short Compression;
 			public short Time;
@@ -163,7 +163,7 @@ namespace SnowPakTool {
 
 			public const int DefaultSignature = 0x02014B50;
 
-			public short Version;
+			public short VersionMadeBy;
 			public short VersionNeeded;
 			public short Flags;
 			public short Compression;
@@ -181,8 +181,8 @@ namespace SnowPakTool {
 			public int LocalOffset;
 
 			public CentralDirectoryFileHeader ( LocalFileHeader header ) {
-				Version = header.Version;
-				VersionNeeded = header.Version;
+				VersionMadeBy = header.VersionNeeded;
+				VersionNeeded = header.VersionNeeded;
 				Flags = header.Flags;
 				Compression = header.Compression;
 				Time = header.Time;
