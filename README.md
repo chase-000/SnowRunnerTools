@@ -5,8 +5,9 @@ Note that its PAK files are really ZIP files with a particular layout and can be
 but require a bit of special handling to create.
 
 ## SnowPakTool
-Used to compress files into a single PAK file and for packing/unpacking _initial.pak\initial.cache_block_ file that
-contains various game data, including UI layout, settings and translations.
+* Compress files into a single PAK file,
+* Create _initial.pak\pak.load_list_ (initial assets loading order),
+* Packing/unpacking _initial.pak\initial.cache_block_ (various game data: UI layout, settings, translations, etc.)
 
 As an example, here's how to increase first and third person FOV slider ranges (they're normally limited to 130 max):
 
