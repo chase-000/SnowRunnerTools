@@ -71,6 +71,7 @@ namespace SnowPakTool {
 					var size = MiscHelpers.EnsureFitsUInt32 ( sourceStream.Length );
 					var relativeNameBytes = relativeNames[i] = MiscHelpers.Encoding.GetBytes ( relativeName );
 					var lfh = localEntries[i] = new LocalFileHeader {
+						Signature = LocalFileHeader.DefaultSignature ,
 						VersionNeeded = ZipVersion ,
 						Flags = 0 ,
 						Compression = 0 ,
@@ -82,7 +83,6 @@ namespace SnowPakTool {
 						NameLength = MiscHelpers.EnsureFitsUInt16 ( relativeNameBytes.Length ) ,
 						ExtraLength = 0 ,
 					};
-					zipStream.WriteValue ( LocalFileHeader.DefaultSignature );
 					zipStream.WriteValue ( lfh );
 					zipStream.Write ( relativeNameBytes , 0 , relativeNameBytes.Length );
 
@@ -101,7 +101,6 @@ namespace SnowPakTool {
 				var cdfh = new CentralDirectoryFileHeader ( lfh ) {
 					LocalOffset = MiscHelpers.EnsureFitsUInt32 ( offsets[i] ) ,
 				};
-				zipStream.WriteValue ( CentralDirectoryFileHeader.DefaultSignature );
 				zipStream.WriteValue ( cdfh );
 				var nameBytes = relativeNames[i];
 				zipStream.Write ( nameBytes , 0 , nameBytes.Length );
@@ -111,6 +110,7 @@ namespace SnowPakTool {
 			//central directory end
 			var centralDirectoryEnd = MiscHelpers.EnsureFitsUInt32 ( zipStream.Position );
 			var eocd = new EndOfCentralDirectory {
+				Signature = EndOfCentralDirectory.DefaultSignature ,
 				DiskNumber = 0 ,
 				CentralDirectoryDiskNumber = 0 ,
 				DiskRecords = count ,
@@ -119,7 +119,6 @@ namespace SnowPakTool {
 				CentralDirectoryOffset = centralDirectoryStart ,
 				CommentLength = 0 ,
 			};
-			zipStream.WriteValue ( EndOfCentralDirectory.DefaultSignature );
 			zipStream.WriteValue ( eocd );
 		}
 
@@ -132,12 +131,12 @@ namespace SnowPakTool {
 
 
 
-
 		[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
 		public struct LocalFileHeader {
 
 			public const int DefaultSignature = 0x04034B50;
 
+			public int Signature;
 			public ushort VersionNeeded;
 			public ushort Flags;
 			public ushort Compression;
@@ -157,6 +156,7 @@ namespace SnowPakTool {
 
 			public const int DefaultSignature = 0x02014B50;
 
+			public int Signature;
 			public ushort VersionMadeBy;
 			public ushort VersionNeeded;
 			public ushort Flags;
@@ -175,6 +175,7 @@ namespace SnowPakTool {
 			public uint LocalOffset;
 
 			public CentralDirectoryFileHeader ( LocalFileHeader header ) {
+				Signature = DefaultSignature;
 				VersionMadeBy = header.VersionNeeded;
 				VersionNeeded = header.VersionNeeded;
 				Flags = header.Flags;
@@ -201,6 +202,7 @@ namespace SnowPakTool {
 
 			public const int DefaultSignature = 0x06054B50;
 
+			public int Signature;
 			public ushort DiskNumber;
 			public ushort CentralDirectoryDiskNumber;
 			public ushort DiskRecords;
