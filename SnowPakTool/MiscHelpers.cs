@@ -8,7 +8,7 @@ namespace SnowPakTool {
 		/// <summary>
 		/// Encoding used for file names. Could be some other encoding entirely, could be a multi-byte one, but works so far.
 		/// </summary>
-		public static Encoding Encoding { get; } = Encoding.GetEncoding ( 437 );
+		public static Encoding Encoding { get; } = Encoding.GetEncoding ( 437 , EncoderFallback.ExceptionFallback , DecoderFallback.ExceptionFallback );
 
 
 		public static int EnsureFitsInt32 ( long value ) {
