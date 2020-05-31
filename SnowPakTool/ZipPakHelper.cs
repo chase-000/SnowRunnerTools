@@ -75,7 +75,7 @@ namespace SnowPakTool {
 						Signature = LocalHeader.DefaultSignature ,
 						VersionNeeded = ZipVersion ,
 						Flags = 0 ,
-						Compression = 0 ,
+						Compression = CompressionMethod.Store ,
 						Time = MiscHelpers.GetDosTime ( dateTime ) ,
 						Date = MiscHelpers.GetDosDate ( dateTime ) ,
 						Crc32 = ComputeCrc32 ( sourceStream , size ) ,

@@ -16,7 +16,7 @@ namespace SnowPakTool.Zip {
 		// +08 2
 		public ushort Flags;
 		// +0A 2
-		public ushort Compression;
+		public CompressionMethod Compression;
 		// +0C 2
 		public ushort Time;
 		// +0E 2
