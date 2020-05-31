@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
+using SnowPakTool.Zip;
 
 namespace SnowPakTool {
 
@@ -127,129 +127,6 @@ namespace SnowPakTool {
 			stream.ProcessChunked ( length , ( buffer , read ) => hasher.TransformBlock ( buffer , 0 , read , buffer , 0 ) );
 			hasher.TransformFinalBlock ( __DummyBuffer , 0 , 0 );
 			return ( hasher.Hash[0] << 24 ) | ( hasher.Hash[1] << 16 ) | ( hasher.Hash[2] << 8 ) | hasher.Hash[3];
-		}
-
-
-
-		[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-		public struct LocalFileHeader {
-
-			public const int DefaultSignature = 0x04034B50;
-
-			// +00 4
-			public int Signature;
-			// +04 2
-			public ushort VersionNeeded;
-			// +06 2
-			public ushort Flags;
-			// +08 2
-			public ushort Compression;
-			// +0A 2
-			public ushort Time;
-			// +0C 2
-			public ushort Date;
-			// +0E 4
-			public int Crc32;
-			// +12 4
-			public uint CompressedSize;
-			// +16 4
-			public uint UncompressedSize;
-			// +1A 2
-			public ushort NameLength;
-			// +1C 2
-			public ushort ExtraLength;
-			// +1E
-
-		}
-
-
-		[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-		public struct CentralDirectoryFileHeader {
-
-			public const int DefaultSignature = 0x02014B50;
-
-			// +00 4
-			public int Signature;
-			// +04 2
-			public ushort VersionMadeBy;
-			// +06 2
-			public ushort VersionNeeded;
-			// +08 2
-			public ushort Flags;
-			// +0A 2
-			public ushort Compression;
-			// +0C 2
-			public ushort Time;
-			// +0E 2
-			public ushort Date;
-			// +10 4
-			public int Crc32;
-			// +14 4
-			public uint CompressedSize;
-			// +18 4
-			public uint UncompressedSize;
-			// +1C 2
-			public ushort NameLength;
-			// +1E 2
-			public ushort ExtraLength;
-			// +20 2
-			public ushort CommentLength;
-			// +22 2
-			public ushort DiskNumber;
-			// +24 2
-			public ushort InternalAttributes;
-			// +26 4
-			public uint ExternalAttributes;
-			// +2A 4
-			public uint LocalOffset;
-			// +2E
-
-			public CentralDirectoryFileHeader ( LocalFileHeader header ) {
-				Signature = DefaultSignature;
-				VersionMadeBy = header.VersionNeeded;
-				VersionNeeded = header.VersionNeeded;
-				Flags = header.Flags;
-				Compression = header.Compression;
-				Time = header.Time;
-				Date = header.Date;
-				Crc32 = header.Crc32;
-				CompressedSize = header.CompressedSize;
-				UncompressedSize = header.UncompressedSize;
-				NameLength = header.NameLength;
-				ExtraLength = 0;
-				CommentLength = 0;
-				DiskNumber = 0;
-				InternalAttributes = 0;
-				ExternalAttributes = 0;
-				LocalOffset = 0;
-			}
-
-		}
-
-
-		[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-		public struct EndOfCentralDirectory {
-
-			public const int DefaultSignature = 0x06054B50;
-
-			// +00 4
-			public int Signature;
-			// +04 2
-			public ushort DiskNumber;
-			// +06 2
-			public ushort CentralDirectoryDiskNumber;
-			// +08 2
-			public ushort DiskRecords;
-			// +0A 2
-			public ushort TotalRecords;
-			// +0C 4
-			public uint CentralDirectorySize;
-			// +10 4
-			public uint CentralDirectoryOffset;
-			// +14 2
-			public ushort CommentLength;
-			// +16
-
 		}
 
 	}
