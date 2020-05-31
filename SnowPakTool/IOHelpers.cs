@@ -136,6 +136,13 @@ namespace SnowPakTool {
 			return directory[directory.Length - 1] == '\\' ? directory : directory + '\\';
 		}
 
+		public static int ComputeCrc32 ( this Stream stream , long length ) {
+			using var hasher = new Crc32Managed ();
+			stream.ProcessChunked ( length , ( buffer , read ) => hasher.TransformBlock ( buffer , 0 , read , buffer , 0 ) );
+			hasher.TransformFinalBlock ( __Buffer , 0 , 0 );
+			return ( hasher.Hash[0] << 24 ) | ( hasher.Hash[1] << 16 ) | ( hasher.Hash[2] << 8 ) | hasher.Hash[3];
+		}
+
 
 		private static byte[] GetBuffer ( int length ) {
 			if ( __Buffer.Length < length ) {

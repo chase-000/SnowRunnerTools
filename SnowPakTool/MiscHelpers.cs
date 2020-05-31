@@ -11,19 +11,14 @@ namespace SnowPakTool {
 		public static Encoding Encoding { get; } = Encoding.GetEncoding ( 437 , EncoderFallback.ExceptionFallback , DecoderFallback.ExceptionFallback );
 
 
-		public static int EnsureFitsInt32 ( long value ) {
-			if ( value > int.MaxValue ) throw new ArgumentOutOfRangeException ( nameof ( value ) , $"Value exceeds {int.MaxValue}." );
-			return (int) value;
-		}
-
-		public static uint EnsureFitsUInt32 ( long value ) {
-			if ( value > uint.MaxValue ) throw new ArgumentOutOfRangeException ( nameof ( value ) , $"Value exceeds {uint.MaxValue}." );
-			return (uint) value;
-		}
-
 		public static ushort EnsureFitsUInt16 ( int value ) {
 			if ( value > ushort.MaxValue ) throw new ArgumentOutOfRangeException ( nameof ( value ) , $"Value exceeds {ushort.MaxValue}." );
 			return (ushort) value;
+		}
+
+		public static int EnsureFitsInt32 ( long value ) {
+			if ( value > int.MaxValue ) throw new ArgumentOutOfRangeException ( nameof ( value ) , $"Value exceeds {int.MaxValue}." );
+			return (int) value;
 		}
 
 		public static ushort GetDosTime ( DateTime dateTime ) {
@@ -43,6 +38,9 @@ namespace SnowPakTool {
 			);
 		}
 
+		public static unsafe uint SizeOf<T> () where T : unmanaged {
+			return (uint) sizeof ( T );
+		}
 
 		internal static void Assert ( bool value ) {
 			if ( !value ) throw new InvalidOperationException ();

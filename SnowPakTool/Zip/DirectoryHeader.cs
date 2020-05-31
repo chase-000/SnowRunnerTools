@@ -43,26 +43,6 @@ namespace SnowPakTool.Zip {
 		public uint LocalHeaderOffset;
 		// +2E
 
-		public DirectoryHeader ( LocalHeader header ) {
-			Signature = DefaultSignature;
-			VersionMadeBy = header.VersionNeeded;
-			VersionNeeded = header.VersionNeeded;
-			Flags = header.Flags;
-			Compression = header.Compression;
-			Time = header.Time;
-			Date = header.Date;
-			Crc32 = header.Crc32;
-			CompressedSize = header.CompressedSize;
-			UncompressedSize = header.UncompressedSize;
-			NameLength = header.NameLength;
-			ExtraLength = 0;
-			CommentLength = 0;
-			DiskNumber = 0;
-			InternalAttributes = 0;
-			ExternalAttributes = 0;
-			LocalHeaderOffset = 0;
-		}
-
 	}
 
 }

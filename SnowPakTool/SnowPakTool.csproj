@@ -55,6 +55,7 @@
     <Compile Include="CacheBlockReader.cs" />
     <Compile Include="CacheBlockWriter.cs" />
     <Compile Include="Zip\CompressionMethod.cs" />
+    <Compile Include="Zip\EndOfDirectory64.cs" />
     <Compile Include="Zip\DirectoryHeader.cs" />
     <Compile Include="Crc32Managed.cs" />
     <Compile Include="CacheBlockFileFileEntry.cs" />
@@ -69,6 +70,9 @@
     <Compile Include="LoadListFile.cs" />
     <Compile Include="LoadListStageEntry.cs" />
     <Compile Include="LoadListStartEntry.cs" />
+    <Compile Include="Zip\EndOfDirectory64Locator.cs" />
+    <Compile Include="Zip\ExtensibleExtraHeader.cs" />
+    <Compile Include="Zip\ExtensibleExtraId.cs" />
     <Compile Include="Zip\LocalHeader.cs" />
     <Compile Include="MiscHelpers.cs" />
     <Compile Include="PakableFileNameComparer.cs" />
