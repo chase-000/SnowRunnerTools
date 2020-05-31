@@ -10,7 +10,8 @@ namespace SnowPakTool {
 			/listcb "D:\Games\SnowRunner_backs\mods\tmp\initial.cache_block"
 			/packcb "D:\Games\SnowRunner_backs\settings\keys\tmp" "D:\Games\SnowRunner_backs\settings\keys\initial.1.cache_block"
 			/unpackcb "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
-			/zippak "D:\Games\SnowRunner\en_us\preload\paks\client\initial" "D:\Games\SnowRunner_backs\__mod\test.pak"
+			/zippak "D:\Games\SnowRunner_backs\mods\.staging\initial-pak" "D:\Games\SnowRunner_backs\mods\.staging\initial.pak"
+			/zippak "D:\Games\SnowRunner_backs\mods\.staging\shared_textures-pak" "D:\Games\SnowRunner_backs\mods\.staging\shared_textures.pak"
 			/listll "D:\Games\SnowRunner_backs\mods\.staging\initial-pak\pak.load_list"
 			/createll "D:\Games\SnowRunner_backs\mods\tmp\pak.load_list" "D:\Games\SnowRunner\en_us\preload\paks\client\initial.pak" "D:\Games\SnowRunner\en_us\preload\paks\client\shared.pak" "D:\Games\SnowRunner\en_us\preload\paks\client\shared_sound.pak"
 		*/

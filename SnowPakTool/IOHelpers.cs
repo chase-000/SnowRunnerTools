@@ -100,11 +100,11 @@ namespace SnowPakTool {
 			}
 		}
 
-		public static void ProcessChunked ( this Stream stream , int length , Action<byte[] , int> action ) {
+		public static void ProcessChunked ( this Stream stream , long length , Action<byte[] , int> action ) {
 			const int Chunk = 65536;
 			while ( length > 0 ) {
 				var buffer = GetBuffer ( Chunk );
-				var read = stream.Read ( buffer , 0 , Math.Min ( length , Chunk ) );
+				var read = stream.Read ( buffer , 0 , (int) Math.Min ( length , Chunk ) );
 				if ( read == 0 ) throw new EndOfStreamException ();
 				action ( buffer , read );
 				length -= read;
@@ -134,6 +134,13 @@ namespace SnowPakTool {
 			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
 			directory = Path.GetFullPath ( directory );
 			return directory[directory.Length - 1] == '\\' ? directory : directory + '\\';
+		}
+
+		public static int ComputeCrc32 ( this Stream stream , long length ) {
+			using var hasher = new Crc32Managed ();
+			stream.ProcessChunked ( length , ( buffer , read ) => hasher.TransformBlock ( buffer , 0 , read , buffer , 0 ) );
+			hasher.TransformFinalBlock ( __Buffer , 0 , 0 );
+			return ( hasher.Hash[0] << 24 ) | ( hasher.Hash[1] << 16 ) | ( hasher.Hash[2] << 8 ) | hasher.Hash[3];
 		}
 
 
