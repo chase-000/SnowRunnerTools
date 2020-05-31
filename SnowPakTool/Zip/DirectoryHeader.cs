@@ -3,7 +3,7 @@
 namespace SnowPakTool.Zip {
 
 	[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-	public struct CentralDirectoryFileHeader {
+	public struct DirectoryHeader {
 
 		public const int DefaultSignature = 0x02014B50;
 
@@ -40,10 +40,10 @@ namespace SnowPakTool.Zip {
 		// +26 4
 		public uint ExternalAttributes;
 		// +2A 4
-		public uint LocalOffset;
+		public uint LocalHeaderOffset;
 		// +2E
 
-		public CentralDirectoryFileHeader ( LocalFileHeader header ) {
+		public DirectoryHeader ( LocalHeader header ) {
 			Signature = DefaultSignature;
 			VersionMadeBy = header.VersionNeeded;
 			VersionNeeded = header.VersionNeeded;
@@ -60,7 +60,7 @@ namespace SnowPakTool.Zip {
 			DiskNumber = 0;
 			InternalAttributes = 0;
 			ExternalAttributes = 0;
-			LocalOffset = 0;
+			LocalHeaderOffset = 0;
 		}
 
 	}

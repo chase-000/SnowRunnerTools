@@ -54,11 +54,11 @@
     <Compile Include="CacheBlockFile.cs" />
     <Compile Include="CacheBlockReader.cs" />
     <Compile Include="CacheBlockWriter.cs" />
-    <Compile Include="Zip\CentralDirectoryFileHeader.cs" />
+    <Compile Include="Zip\DirectoryHeader.cs" />
     <Compile Include="Crc32Managed.cs" />
     <Compile Include="CacheBlockFileFileEntry.cs" />
     <Compile Include="DirectoryFilesContainer.cs" />
-    <Compile Include="Zip\EndOfCentralDirectory.cs" />
+    <Compile Include="Zip\EndOfDirectory.cs" />
     <Compile Include="FilesContainer.cs" />
     <Compile Include="IOHelpers.cs" />
     <Compile Include="LoadListAssetEntry.cs" />
@@ -68,7 +68,7 @@
     <Compile Include="LoadListFile.cs" />
     <Compile Include="LoadListStageEntry.cs" />
     <Compile Include="LoadListStartEntry.cs" />
-    <Compile Include="Zip\LocalFileHeader.cs" />
+    <Compile Include="Zip\LocalHeader.cs" />
     <Compile Include="MiscHelpers.cs" />
     <Compile Include="PakableFileNameComparer.cs" />
     <Compile Include="Program.cs" />

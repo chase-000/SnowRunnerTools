@@ -56,7 +56,7 @@ namespace SnowPakTool {
 
 		private static void StoreFiles ( Stream zipStream , IReadOnlyList<KeyValuePair<string , string>> files ) {
 			var count = MiscHelpers.EnsureFitsUInt16 ( files.Count );
-			var localEntries = new LocalFileHeader[count];
+			var localHeaders = new LocalHeader[count];
 			var relativeNames = new byte[count][];
 			var offsets = new long[count];
 
@@ -70,8 +70,8 @@ namespace SnowPakTool {
 				using ( var sourceStream = File.OpenRead ( location ) ) {
 					var size = MiscHelpers.EnsureFitsUInt32 ( sourceStream.Length );
 					var relativeNameBytes = relativeNames[i] = MiscHelpers.Encoding.GetBytes ( relativeName );
-					var lfh = localEntries[i] = new LocalFileHeader {
-						Signature = LocalFileHeader.DefaultSignature ,
+					var header = localHeaders[i] = new LocalHeader {
+						Signature = LocalHeader.DefaultSignature ,
 						VersionNeeded = ZipVersion ,
 						Flags = 0 ,
 						Compression = 0 ,
@@ -83,7 +83,7 @@ namespace SnowPakTool {
 						NameLength = MiscHelpers.EnsureFitsUInt16 ( relativeNameBytes.Length ) ,
 						ExtraLength = 0 ,
 					};
-					zipStream.WriteValue ( lfh );
+					zipStream.WriteValue ( header );
 					zipStream.Write ( relativeNameBytes , 0 , relativeNameBytes.Length );
 
 					sourceStream.Position = 0;
@@ -94,32 +94,31 @@ namespace SnowPakTool {
 
 			//central directory entries
 			Console.Write ( "Writing central directory." );
-			var centralDirectoryStart = MiscHelpers.EnsureFitsUInt32 ( zipStream.Position );
+			var directoryStart = MiscHelpers.EnsureFitsUInt32 ( zipStream.Position );
 			for ( int i = 0; i < count; i++ ) {
 				Console.Write ( $"\rWriting central directory: {i + 1}/{count}" );
-				var lfh = localEntries[i];
-				var cdfh = new CentralDirectoryFileHeader ( lfh ) {
-					LocalOffset = MiscHelpers.EnsureFitsUInt32 ( offsets[i] ) ,
+				var header = new DirectoryHeader ( localHeaders[i] ) {
+					LocalHeaderOffset = MiscHelpers.EnsureFitsUInt32 ( offsets[i] ) ,
 				};
-				zipStream.WriteValue ( cdfh );
+				zipStream.WriteValue ( header );
 				var nameBytes = relativeNames[i];
 				zipStream.Write ( nameBytes , 0 , nameBytes.Length );
 			}
 			Console.WriteLine ();
 
 			//central directory end
-			var centralDirectoryEnd = MiscHelpers.EnsureFitsUInt32 ( zipStream.Position );
-			var eocd = new EndOfCentralDirectory {
-				Signature = EndOfCentralDirectory.DefaultSignature ,
+			var directoryEnd = MiscHelpers.EnsureFitsUInt32 ( zipStream.Position );
+			var eod = new EndOfDirectory {
+				Signature = EndOfDirectory.DefaultSignature ,
 				DiskNumber = 0 ,
-				CentralDirectoryDiskNumber = 0 ,
+				DirectoryDiskNumber = 0 ,
 				DiskRecords = count ,
 				TotalRecords = count ,
-				CentralDirectorySize = centralDirectoryEnd - centralDirectoryStart ,
-				CentralDirectoryOffset = centralDirectoryStart ,
+				DirectorySize = directoryEnd - directoryStart ,
+				DirectoryOffset = directoryStart ,
 				CommentLength = 0 ,
 			};
-			zipStream.WriteValue ( eocd );
+			zipStream.WriteValue ( eod );
 		}
 
 		public static int ComputeCrc32 ( this Stream stream , long length ) {

@@ -3,7 +3,7 @@
 namespace SnowPakTool.Zip {
 
 	[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-	public struct EndOfCentralDirectory {
+	public struct EndOfDirectory {
 
 		public const int DefaultSignature = 0x06054B50;
 
@@ -12,15 +12,15 @@ namespace SnowPakTool.Zip {
 		// +04 2
 		public ushort DiskNumber;
 		// +06 2
-		public ushort CentralDirectoryDiskNumber;
+		public ushort DirectoryDiskNumber;
 		// +08 2
 		public ushort DiskRecords;
 		// +0A 2
 		public ushort TotalRecords;
 		// +0C 4
-		public uint CentralDirectorySize;
+		public uint DirectorySize;
 		// +10 4
-		public uint CentralDirectoryOffset;
+		public uint DirectoryOffset;
 		// +14 2
 		public ushort CommentLength;
 		// +16

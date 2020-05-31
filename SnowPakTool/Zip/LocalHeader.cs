@@ -3,7 +3,7 @@
 namespace SnowPakTool.Zip {
 
 	[StructLayout ( LayoutKind.Sequential , Pack = 1 )]
-	public struct LocalFileHeader {
+	public struct LocalHeader {
 
 		public const int DefaultSignature = 0x04034B50;
 
