@@ -68,6 +68,7 @@ namespace SnowPakTool {
 				var location = files[i].Value;
 				var relativeName = files[i].Key;
 				using ( var sourceStream = File.OpenRead ( location ) ) {
+					var dateTime = File.GetLastWriteTime ( location );
 					var size = MiscHelpers.EnsureFitsUInt32 ( sourceStream.Length );
 					var relativeNameBytes = relativeNames[i] = MiscHelpers.Encoding.GetBytes ( relativeName );
 					var header = localHeaders[i] = new LocalHeader {
@@ -75,8 +76,8 @@ namespace SnowPakTool {
 						VersionNeeded = ZipVersion ,
 						Flags = 0 ,
 						Compression = 0 ,
-						Time = 0 ,
-						Date = 0 ,
+						Time = MiscHelpers.GetDosTime ( dateTime ) ,
+						Date = MiscHelpers.GetDosDate ( dateTime ) ,
 						Crc32 = ComputeCrc32 ( sourceStream , size ) ,
 						CompressedSize = size ,
 						UncompressedSize = size ,

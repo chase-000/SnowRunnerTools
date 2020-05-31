@@ -26,6 +26,24 @@ namespace SnowPakTool {
 			return (ushort) value;
 		}
 
+		public static ushort GetDosTime ( DateTime dateTime ) {
+			return (ushort) (
+				dateTime.Second / 2
+				| dateTime.Minute << 5
+				| dateTime.Hour << 11
+			);
+		}
+
+		public static ushort GetDosDate ( DateTime dateTime ) {
+			if ( dateTime.Year < 1980 || dateTime.Year >= 2108 ) return 0;
+			return (ushort) (
+				dateTime.Day
+				| dateTime.Month << 5
+				| ( dateTime.Year - 1980 ) << 9
+			);
+		}
+
+
 		internal static void Assert ( bool value ) {
 			if ( !value ) throw new InvalidOperationException ();
 		}
