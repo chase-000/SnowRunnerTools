@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SnowPakTool": {
+      "commandName": "Project",
+      "commandLineArgs": "/listcb \"D:\\Games\\SnowRunner_backs\\mods\\initial.cache_block\""
+    }
+  }
+}
