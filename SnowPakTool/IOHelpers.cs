@@ -38,15 +38,16 @@ namespace SnowPakTool {
 			return result;
 		}
 
-		public static string ReadString ( this Stream stream , int length ) {
-			var buffer = GetBuffer ( length );
-			var read = stream.Read ( buffer , 0 , length );
+		public static string ReadString ( this Stream stream , int bytesCount ) {
+			var buffer = GetBuffer ( bytesCount );
+			var read = stream.Read ( buffer , 0 , bytesCount );
+			if ( read != bytesCount ) throw new EndOfStreamException ();
 			return MiscHelpers.Encoding.GetString ( buffer , 0 , read );
 		}
 
 		public static string ReadLength32String ( this Stream stream ) {
-			var length = stream.ReadInt32 ();
-			return ReadString ( stream , length );
+			var bytesCount = stream.ReadInt32 ();
+			return ReadString ( stream , bytesCount );
 		}
 
 		public static string[] ReadLength32StringsArray ( this Stream stream , int count ) {
@@ -59,13 +60,15 @@ namespace SnowPakTool {
 
 		public static void WriteString ( this Stream stream , string value ) {
 			var buffer = GetBuffer ( value.Length * 4 );
-			var length = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
-			stream.Write ( buffer , 0 , length );
+			var bytesCount = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
+			stream.Write ( buffer , 0 , bytesCount );
 		}
 
 		public static void WriteLength32String ( this Stream stream , string value ) {
-			WriteValue ( stream , value.Length );
-			WriteString ( stream , value );
+			var buffer = GetBuffer ( value.Length * 4 );
+			var bytesCount = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
+			WriteValue ( stream , bytesCount );
+			stream.Write ( buffer , 0 , bytesCount );
 		}
 
 		public static unsafe T ReadValue<T> ( this Stream stream ) where T : unmanaged {
