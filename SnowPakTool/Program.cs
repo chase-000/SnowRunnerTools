@@ -51,6 +51,14 @@ namespace SnowPakTool {
 					CreateLoadList ( args[1] , args[2] , args[3] , args[4] );
 					return 0;
 
+				case "/listsl":
+					ListSoundList ( args[1] );
+					return 0;
+
+				case "/createsl":
+					CreateSoundList ( args[1] , args[2] );
+					return 0;
+
 				default:
 					PrintHelp ();
 					return 1;
@@ -166,6 +174,32 @@ namespace SnowPakTool {
 			LoadListFile.WriteFileNames ( loadListLocation , initialContainerFiles , sharedContainerFiles , sharedSoundContainerFiles );
 		}
 
+		private static void ListSoundList ( string soundListLocation ) {
+			var names = SoundListFile.ReadEntries ( soundListLocation ).ToList ();
+			foreach ( var name in names ) {
+				Console.WriteLine ( name );
+			}
+
+			Console.WriteLine ( $"---\n{names.Count} name(s)" );
+
+			var extensions = names.GroupBy ( a => Path.GetExtension ( a ) );
+			foreach ( var item in extensions ) {
+				Console.WriteLine ( $"{item.Key}: {item.Count ()}" );
+			}
+		}
+
+		private static void CreateSoundList ( string sourceLocation , string soundListLocation ) {
+			Console.WriteLine ( $"Scanning '{sourceLocation}' for .pcm files." );
+			var sourceContainer = FilesContainer.From ( sourceLocation );
+			var names = sourceContainer.GetFiles ().Where ( a => a.EndsWith ( ".pcm" , StringComparison.OrdinalIgnoreCase ) ).ToList ();
+			Console.WriteLine ( $"{names.Count} .pcm files found." );
+			Console.WriteLine ( "Writing." );
+			SoundListFile.WriteEntries ( soundListLocation , names );
+			Console.WriteLine ( "Done." );
+		}
+
+
+
 		private static void PrintHelp () {
 			Console.WriteLine ( "Usage:" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /license" );
@@ -176,6 +210,8 @@ namespace SnowPakTool {
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listll pak.load_list" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listllc pak.load_list" );
 			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /createll pak.load_list initial_pak_or_directory shared_pak_or_directory shared_sound_pak_or_directory" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listsl sound.sound_list" );
+			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /createsl pak_or_directory sound.sound_list" );
 		}
 
 	}

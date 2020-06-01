@@ -54,6 +54,7 @@
     <Compile Include="CacheBlockFile.cs" />
     <Compile Include="CacheBlockReader.cs" />
     <Compile Include="CacheBlockWriter.cs" />
+    <Compile Include="SoundListFile.cs" />
     <Compile Include="Zip\CompressionMethod.cs" />
     <Compile Include="Zip\EndOfDirectory64.cs" />
     <Compile Include="Zip\DirectoryHeader.cs" />
