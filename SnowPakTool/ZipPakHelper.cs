@@ -186,7 +186,7 @@ namespace SnowPakTool {
 			if ( isZip64 ) {
 				var eod64 = new EndOfDirectory64 {
 					Signature = EndOfDirectory64.DefaultSignature ,
-					Size = MiscHelpers.SizeOf<EndOfDirectory64> () - 4 - 8 ,
+					Size = (ulong) ( MiscHelpers.SizeOf<EndOfDirectory64> () - 4 - 8 ) ,
 					VersionMadeBy = ZipVersion ,
 					VersionNeeded = ZipVersion ,
 					DiskNumber = 0 ,

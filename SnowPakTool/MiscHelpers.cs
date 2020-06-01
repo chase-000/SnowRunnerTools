@@ -38,8 +38,8 @@ namespace SnowPakTool {
 			);
 		}
 
-		public static unsafe uint SizeOf<T> () where T : unmanaged {
-			return (uint) sizeof ( T );
+		public static unsafe int SizeOf<T> () where T : unmanaged {
+			return sizeof ( T );
 		}
 
 		internal static void Assert ( bool value ) {
