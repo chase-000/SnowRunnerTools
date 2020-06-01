@@ -65,20 +65,18 @@ namespace SnowPakTool {
 		}
 
 		public static void WriteLength32String ( this Stream stream , string value ) {
-			var buffer = GetBuffer ( value.Length * 4 );
-			var bytesCount = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 0 );
-			WriteValue ( stream , bytesCount );
-			stream.Write ( buffer , 0 , bytesCount );
+			var buffer = GetBuffer ( 4 + value.Length * 4 );
+			var bytesCount = MiscHelpers.Encoding.GetBytes ( value , 0 , value.Length , buffer , 4 );
+			buffer.SetValueAt ( 0 , bytesCount );
+			stream.Write ( buffer , 0 , 4 + bytesCount );
 		}
 
-		public static unsafe T ReadValue<T> ( this Stream stream ) where T : unmanaged {
-			var size = sizeof ( T );
+		public static T ReadValue<T> ( this Stream stream ) where T : unmanaged {
+			var size = MiscHelpers.SizeOf<T> ();
 			var buffer = GetBuffer ( size );
 			var read = stream.Read ( buffer , 0 , size );
 			if ( read != size ) throw new EndOfStreamException ();
-			fixed ( byte* p = buffer ) {
-				return *(T*) p;
-			}
+			return buffer.GetValueAt<T> ( 0 );
 		}
 
 		public static T[] ReadValuesArray<T> ( this Stream stream , int count ) where T : unmanaged {
@@ -89,12 +87,11 @@ namespace SnowPakTool {
 			return result;
 		}
 
-		public static unsafe void WriteValue<T> ( this Stream stream , T value ) where T : unmanaged {
-			var buffer = GetBuffer ( sizeof ( T ) );
-			fixed ( byte* p = buffer ) {
-				*(T*) p = value;
-			}
-			stream.Write ( buffer , 0 , sizeof ( T ) );
+		public static void WriteValue<T> ( this Stream stream , T value ) where T : unmanaged {
+			var size = MiscHelpers.SizeOf<T> ();
+			var buffer = GetBuffer ( size );
+			buffer.SetValueAt ( 0 , value );
+			stream.Write ( buffer , 0 , size );
 		}
 
 		public static void WriteValuesArray<T> ( this Stream stream , T[] values ) where T : unmanaged {

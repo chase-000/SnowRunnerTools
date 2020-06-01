@@ -42,6 +42,22 @@ namespace SnowPakTool {
 			return sizeof ( T );
 		}
 
+		public static unsafe void SetValueAt<T> ( this byte[] buffer , int offset , T value ) where T : unmanaged {
+			if ( buffer is null ) throw new ArgumentNullException ( nameof ( buffer ) );
+			if ( offset < 0 || offset + sizeof ( T ) > buffer.Length ) throw new ArgumentOutOfRangeException ( nameof ( offset ) );
+			fixed ( byte* p = buffer ) {
+				*(T*) ( p + offset ) = value;
+			}
+		}
+
+		public static unsafe T GetValueAt<T> ( this byte[] buffer , int offset ) where T : unmanaged {
+			if ( buffer is null ) throw new ArgumentNullException ( nameof ( buffer ) );
+			if ( offset < 0 || offset + sizeof ( T ) > buffer.Length ) throw new ArgumentOutOfRangeException ( nameof ( offset ) );
+			fixed ( byte* p = buffer ) {
+				return *(T*) ( p + offset );
+			}
+		}
+
 		internal static void Assert ( bool value ) {
 			if ( !value ) throw new InvalidOperationException ();
 		}
