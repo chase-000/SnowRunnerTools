@@ -10,6 +10,7 @@
     <Copyright>Copyright © 2020 chase &lt;s.chubukov@protonmail.com&gt;</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/chase-000/SnowRunnerTools</PackageProjectUrl>
+    <Version>1.4.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

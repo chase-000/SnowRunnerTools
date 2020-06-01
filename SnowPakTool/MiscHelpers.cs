@@ -5,10 +5,16 @@ namespace SnowPakTool {
 
 	public static class MiscHelpers {
 
+		private static readonly Lazy<Encoding> __Encoding = new Lazy<Encoding> ( () => {
+			Encoding.RegisterProvider ( CodePagesEncodingProvider.Instance );
+			return Encoding.GetEncoding ( 437 , EncoderFallback.ExceptionFallback , DecoderFallback.ExceptionFallback );
+		} );
+
+
 		/// <summary>
 		/// Encoding used for file names. Could be some other encoding entirely, could be a multi-byte one, but works so far.
 		/// </summary>
-		public static Encoding Encoding { get; } = Encoding.GetEncoding ( 437 , EncoderFallback.ExceptionFallback , DecoderFallback.ExceptionFallback );
+		public static Encoding Encoding => __Encoding.Value;
 
 
 		public static ushort EnsureFitsUInt16 ( int value ) {

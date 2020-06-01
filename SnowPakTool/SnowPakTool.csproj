@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <Authors>chase &lt;s.chubukov@protonmail.com&gt;</Authors>
     <PackageId>SnowPakTool</PackageId>
     <Product>SnowRunnerTools</Product>
