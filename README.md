@@ -7,6 +7,7 @@ but require a bit of special handling to create.
 ## SnowPakTool
 * Compress files into a single PAK file,
 * Create _initial.pak\pak.load_list_ (initial assets loading order),
+* Create _shared_sound.pak\sound.sound_list_,
 * Packing/unpacking _initial.pak\initial.cache_block_ (various game data: UI layout, settings, translations, etc.)
 
 As an example, here's how to increase first and third person FOV slider ranges (they're normally limited to 130 max):
