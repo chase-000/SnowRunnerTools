@@ -21,18 +21,12 @@ namespace SnowPakTool {
 
 		public static CacheBlockFileFileEntry FromInternalName ( string name ) {
 			if ( name is null ) throw new ArgumentNullException ( nameof ( name ) );
-			return new CacheBlockFileFileEntry {
-				InternalName = name ,
-				ExternalName = InternalNameToExternalName ( name ) ,
-			};
+			return new CacheBlockFileFileEntry ( name , InternalNameToExternalName ( name ) );
 		}
 
 		public static CacheBlockFileFileEntry FromExternalName ( string name ) {
 			if ( name is null ) throw new ArgumentNullException ( nameof ( name ) );
-			return new CacheBlockFileFileEntry {
-				ExternalName = name ,
-				InternalName = ExternalNameToInternalName ( name ) ,
-			};
+			return new CacheBlockFileFileEntry ( ExternalNameToInternalName ( name ) , name );
 		}
 
 		public static string InternalNameToExternalName ( string name ) {
@@ -72,15 +66,17 @@ namespace SnowPakTool {
 
 
 
-		public string InternalName { get; private set; }
-		public string ExternalName { get; private set; }
+		public string InternalName { get; }
+		public string ExternalName { get; }
 
 		public long RelativeOffset { get; set; }
 		public int Size { get; set; }
 		public int Zero { get; set; }
 
 
-		private CacheBlockFileFileEntry () {
+		private CacheBlockFileFileEntry ( string internalName , string externalName ) {
+			InternalName = internalName;
+			ExternalName = externalName;
 		}
 
 	}

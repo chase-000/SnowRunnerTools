@@ -89,25 +89,27 @@ namespace SnowPakTool {
 			var lastGroup = -1;
 			for ( int i = 0; i < entries.Count; i++ ) {
 				var entry = entries[i];
+				var dependencies = entry.DependsOn;
+				var dependenciesCount = dependencies.Length;
 				if ( lastGroup < 0 ) {
-					if ( entry.DependsOn.Length > 0 ) {
+					if ( dependenciesCount > 0 ) {
 						Console.WriteLine ( "[0] Start entry has dependencies." );
 					}
 					lastGroup = i;
 					continue;
 				}
 
-				var orderedDependsOn = entry.DependsOn.OrderBy ( a => a ).ToList ();
-				if ( !entry.DependsOn.SequenceEqual ( orderedDependsOn ) ) {
+				var orderedDependencies = dependencies.OrderBy ( a => a ).ToList ();
+				if ( !dependencies.SequenceEqual ( orderedDependencies ) ) {
 					Console.WriteLine ( $"[{i}] Dependencies list is not sorted." );
 				}
 
 				switch ( entries[i] ) {
 					case LoadListAssetEntry _:
-						if ( entry.DependsOn.Length == 0 ) {
+						if ( dependenciesCount == 0 ) {
 							Console.WriteLine ( $"[{i}] Asset has no dependencies." );
 						}
-						if ( entry.DependsOn.Length > 1 ) {
+						if ( dependenciesCount > 1 ) {
 							Console.WriteLine ( $"[{i}] Asset has more than one dependency." );
 						}
 						break;
@@ -115,15 +117,15 @@ namespace SnowPakTool {
 					case LoadListEndEntry _:
 					case LoadListStageEntry _:
 						if ( i - lastGroup > 1 ) {
-							if ( !Enumerable.Range ( lastGroup + 1 , i - lastGroup - 1 ).SequenceEqual ( orderedDependsOn ) ) {
+							if ( !Enumerable.Range ( lastGroup + 1 , i - lastGroup - 1 ).SequenceEqual ( orderedDependencies ) ) {
 								Console.WriteLine ( $"[{i}] Stage doesn't depend on previous assets exactly." );
 							}
 						}
 						else {
-							if ( entry.DependsOn.Length == 0 ) {
+							if ( dependenciesCount == 0 ) {
 								Console.WriteLine ( $"[{i}] Stage has no dependencies." );
 							}
-							if ( entry.DependsOn.Length > 1 ) {
+							if ( dependenciesCount > 1 ) {
 								Console.WriteLine ( $"[{i}] Stage depends on more than immediately preceding stage." );
 							}
 						}

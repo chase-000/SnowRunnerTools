@@ -66,7 +66,8 @@ namespace SnowPakTool {
 		}
 
 		private static void PrintLicense () {
-			using var stream = typeof ( Program ).Assembly.GetManifestResourceStream ( $"{nameof ( SnowPakTool )}.LICENSE" );
+			using var stream = typeof ( Program ).Assembly.GetManifestResourceStream ( $"{nameof ( SnowPakTool )}.LICENSE" )
+						?? throw new InvalidOperationException ( "Can't find the license resource." );
 			using var reader = new StreamReader ( stream );
 			Console.WriteLine ( reader.ReadToEnd () );
 		}
@@ -86,7 +87,8 @@ namespace SnowPakTool {
 
 		private static void UnpackCacheBlock ( string[] args ) {
 			var sourceLocation = Path.GetFullPath ( args[1] );
-			var sourceDirectory = Path.GetDirectoryName ( sourceLocation );
+			if ( !File.Exists ( sourceLocation ) ) throw new IOException ( $"Can't find cache block file '{sourceLocation}'." );
+			var sourceDirectory = Path.GetDirectoryName ( sourceLocation ); //file exists, so this is neither a null nor root
 			var targetDirectory = args.Length >= 3
 						? Path.GetFullPath ( args[2] )
 						: Path.Combine ( sourceDirectory , Path.GetFileNameWithoutExtension ( sourceLocation ) );
