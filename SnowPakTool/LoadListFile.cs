@@ -32,17 +32,15 @@ namespace SnowPakTool {
 			stream.ReadMagicInt32 ( 1 ); //array length?
 			stream.ReadMagicByte ( 1 ); //data type?
 			var entriesCount = stream.ReadInt32 ();
+			if ( entriesCount < 2 ) throw new InvalidDataException ( "Invalid number of entries." );
 			stream.ReadMagicInt32 ( 3 ); //???
 			stream.ReadMagicByte ( 1 ); //???
 
 			//types byte array
 			var entryTypes = stream.ReadValuesArray<LoadListEntryType> ( entriesCount );
-
-			if ( entriesCount < 2 ) throw new InvalidDataException ( "Invalid number of entries." );
 			if ( entryTypes[0] != LoadListEntryType.Start ) throw new InvalidDataException ( "First entry is not a start entry." );
-			if ( entryTypes[entriesCount - 1] != LoadListEntryType.End ) throw new InvalidDataException ( "Last entry is not an end entry." );
+			if ( entryTypes[^1] != LoadListEntryType.End ) throw new InvalidDataException ( "Last entry is not an end entry." );
 			if ( !entryTypes.Skip ( 1 ).Take ( entriesCount - 2 ).All ( a => a == LoadListEntryType.Stage || a == LoadListEntryType.Asset ) ) throw new InvalidDataException ( "Unknown entry type." );
-
 			stream.ReadMagicByte ( 1 ); //???
 
 			//order/dependencies

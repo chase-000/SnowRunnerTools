@@ -27,7 +27,7 @@ namespace SnowPakTool {
 			if ( location.Length == 0 ) throw new ArgumentException ( "Empty container location string." , nameof ( location ) );
 
 			//a mix of guesstimation and definite creation based on object existence and location format
-			if ( location[location.Length - 1] == '\\' || Directory.Exists ( location ) ) {
+			if ( location[^1] == '\\' || Directory.Exists ( location ) ) {
 				return new DirectoryFilesContainer ( location );
 			}
 			else if ( TryGetFileFactory ( location ) is var factory && factory != null ) {
