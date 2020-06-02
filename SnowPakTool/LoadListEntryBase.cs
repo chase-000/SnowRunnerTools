@@ -11,7 +11,7 @@ namespace SnowPakTool {
 
 		public int Index { get; set; }
 		public abstract LoadListEntryType Type { get; }
-		public virtual int ExpectedStringsCount => 0;
+		public virtual int StringsCount => 0;
 		public long DependencyEntryOffset { get; set; }
 		public long StringsEntryOffset { get; set; }
 		public byte[] MagicA { get; set; }
@@ -28,6 +28,11 @@ namespace SnowPakTool {
 			}
 		}
 
+
+		public virtual bool IsValidStringsCount ( int count ) {
+			return count == 0;
+		}
+
 		public virtual void WriteType ( Stream stream ) {
 			stream.WriteByte ( (byte) Type );
 		}
@@ -40,11 +45,15 @@ namespace SnowPakTool {
 			}
 		}
 
+		public virtual void LoadStrings ( string[] strings ) {
+			// Method intentionally left empty.
+		}
+
 		public virtual void WriteStrings ( Stream stream ) {
-			if ( MagicA != null && MagicA.Length != ExpectedStringsCount ) throw new NotSupportedException ( $"{nameof ( MagicA )} can only contain {ExpectedStringsCount} points of magic." );
-			stream.WriteValue ( ExpectedStringsCount );
+			if ( MagicA != null && MagicA.Length != StringsCount ) throw new NotSupportedException ( $"{nameof ( MagicA )} can only contain {StringsCount} point(s) of magic." );
+			stream.WriteValue ( StringsCount );
 			stream.WriteValue ( MagicB?.Length ?? ExpectedMagicBCount );
-			WriteMagic ( stream , MagicA , ExpectedStringsCount , ExpectedMagicAValue );
+			WriteMagic ( stream , MagicA , StringsCount , ExpectedMagicAValue );
 			WriteMagic ( stream , MagicB , ExpectedMagicBCount , ExpectedMagicBValue );
 		}
 

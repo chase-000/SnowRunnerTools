@@ -111,6 +111,10 @@ namespace SnowPakTool {
 			var entries = LoadListFile.ReadEntries ( loadListLocation );
 			foreach ( var item in entries ) {
 				Console.WriteLine ( item );
+				if ( item is LoadListAssetEntry asset && asset.Json != null ) {
+					Console.Write ( "    " );
+					Console.WriteLine ( asset.Json );
+				}
 			}
 
 			LoadListFile.ValidateLoadListOrdering ( entries );

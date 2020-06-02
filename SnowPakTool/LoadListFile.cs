@@ -69,21 +69,13 @@ namespace SnowPakTool {
 				entry.MagicA = stream.ReadByteArray ( stringsCount );
 				entry.MagicB = stream.ReadByteArray ( magicBCount );
 
-				if ( stringsCount != entry.ExpectedStringsCount ) throw new InvalidDataException ( $"Unexpected strings count for entry {i} @0x{entry.StringsEntryOffset:X}." );
+				if ( !entry.IsValidStringsCount ( stringsCount ) ) throw new InvalidDataException ( $"Unexpected strings count ({stringsCount}) for entry {i} @0x{entry.StringsEntryOffset:X}." );
 				if ( magicBCount != LoadListEntryBase.ExpectedMagicBCount ) throw new InvalidDataException ( $"Unexpected length of magic array 'B' for entry {i} @0x{entry.StringsEntryOffset:X}." );
 				if ( entry.MagicA.Any ( a => a != LoadListEntryBase.ExpectedMagicAValue ) ) throw new InvalidDataException ( $"Unexpected value in magic array 'A' for entry {i} @0x{entry.StringsEntryOffset:X}." );
 				if ( entry.MagicB.Any ( a => a != LoadListEntryBase.ExpectedMagicBValue ) ) throw new InvalidDataException ( $"Unexpected value in magic array 'B' for entry {i} @0x{entry.StringsEntryOffset:X}." );
 
-				if ( entry is LoadListStageEntry stage ) {
-					stage.Text = stream.ReadLength32String ();
-				}
-				else if ( entry is LoadListAssetEntry asset ) {
-					asset.InternalName = stream.ReadLength32String ();
-					asset.ExternalName = LoadListAssetEntry.InternalNameToExternalName ( asset.InternalName , out var ps );
-					asset.InternalNamePs = ps;
-					asset.Loader = stream.ReadLength32String ();
-					asset.PakName = stream.ReadLength32String ();
-				}
+				var strings = stream.ReadLength32StringsArray ( stringsCount );
+				entry.LoadStrings ( strings );
 			}
 
 			if ( stream.Position != stream.Length ) throw new InvalidDataException ( "Unknown data beyond logical end of load_list file." );

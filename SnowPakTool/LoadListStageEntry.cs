@@ -1,14 +1,24 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace SnowPakTool {
 
 	public class LoadListStageEntry : LoadListEntryBase {
 
 		public override LoadListEntryType Type => LoadListEntryType.Stage;
-		public override int ExpectedStringsCount => 1;
+		public override int StringsCount => 1;
 		public string Text { get; set; }
 
 
+		public override bool IsValidStringsCount ( int count ) {
+			return count == 1;
+		}
+
+		public override void LoadStrings ( string[] strings ) {
+			if ( strings is null ) throw new ArgumentNullException ( nameof ( strings ) );
+			if ( !IsValidStringsCount ( strings.Length ) ) throw new NotSupportedException ();
+			Text = strings[0];
+		}
 
 		public override void WriteStrings ( Stream stream ) {
 			base.WriteStrings ( stream );

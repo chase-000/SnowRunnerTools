@@ -69,19 +69,42 @@ namespace SnowPakTool {
 
 
 		public override LoadListEntryType Type => LoadListEntryType.Asset;
-		public override int ExpectedStringsCount => 3;
 		public string InternalName { get; set; }
 		public string InternalNamePs { get; set; }
 		public string ExternalName { get; set; }
 		public string Loader { get; set; }
 		public string PakName { get; set; }
+		public string Json { get; set; }
 
+		public override int StringsCount => Json == null ? 3 : 4;
+
+
+		public override bool IsValidStringsCount ( int count ) {
+			return count == 3 || count == 4;
+		}
+
+		public override void LoadStrings ( string[] strings ) {
+			if ( strings is null ) throw new ArgumentNullException ( nameof ( strings ) );
+			if ( !IsValidStringsCount ( strings.Length ) ) throw new NotSupportedException ();
+
+			InternalName = strings[0];
+			ExternalName = InternalNameToExternalName ( InternalName , out var ps );
+			InternalNamePs = ps;
+			Loader = strings[1];
+			PakName = strings[2];
+			if ( strings.Length >= 4 ) {
+				Json = strings[3];
+			}
+		}
 
 		public override void WriteStrings ( Stream stream ) {
 			base.WriteStrings ( stream );
 			stream.WriteLength32String ( InternalName );
 			stream.WriteLength32String ( Loader );
 			stream.WriteLength32String ( PakName );
+			if ( Json != null ) {
+				stream.WriteLength32String ( Json );
+			}
 		}
 
 		public override string ToString () {
