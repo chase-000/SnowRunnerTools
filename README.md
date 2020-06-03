@@ -15,11 +15,11 @@ As an example, here's how to increase first and third person FOV slider ranges (
 ```bat
 set client=D:\Games\SnowRunner\en_us\preload\paks\client
 
-7z x -oinitial_pak "%client%\initial.pak"
-snowpaktool /unpackcb initial_pak\initial.cache_block initial_cache_block
+7z x -o"initial_pak" "%client%\initial.pak"
+snowpaktool cb unpack initial_pak\initial.cache_block initial_cache_block
 patch -u -i ui_settings_controller.sso.diff initial_cache_block\[ps]\ui_settings_controller.sso
 del initial_pak\initial.cache_block
-snowpaktool /packcb initial_cache_block initial_pak\initial.cache_block
+snowpaktool cb pack initial_cache_block initial_pak\initial.cache_block
 del "%client%\initial.pak"
-snowpaktool /zippak initial_pak "%client%\initial.pak"
+snowpaktool pak pack initial_pak "%client%\initial.pak"
 ```
