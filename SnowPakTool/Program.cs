@@ -1,79 +1,94 @@
 ﻿using System;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace SnowPakTool {
 
 	public static class Program {
 
-		/*
-			/listcb "D:\Games\SnowRunner_backs\mods\tmp\initial.cache_block"
-			/packcb "D:\Games\SnowRunner_backs\settings\keys\tmp" "D:\Games\SnowRunner_backs\settings\keys\initial.1.cache_block"
-			/unpackcb "D:\Games\SnowRunner_backs\settings\keys\initial.cache_block"
-			/zippak "D:\Games\SnowRunner_backs\mods\.staging\initial-pak" "D:\Games\SnowRunner_backs\mods\.staging\initial.pak"
-			/zippak "D:\Games\SnowRunner_backs\mods\.staging\shared_textures-pak" "D:\Games\SnowRunner_backs\mods\.staging\shared_textures.pak"
-			/listll "D:\Games\SnowRunner_backs\mods\.staging\initial-pak\pak.load_list"
-			/createll "D:\Games\SnowRunner_backs\mods\tmp\pak.load_list" "D:\Games\SnowRunner\en_us\preload\paks\client\initial.pak" "D:\Games\SnowRunner\en_us\preload\paks\client\shared.pak" "D:\Games\SnowRunner\en_us\preload\paks\client\shared_sound.pak"
-		*/
-
 		public static int Main ( string[] args ) {
-			switch ( args.Length > 0 ? args[0] : null ) {
 
-				case "/license":
-					PrintLicense ();
-					return 0;
+			var root = new RootCommand ( typeof ( Program ).Assembly.GetCustomAttribute<AssemblyTitleAttribute> ().Title );
+			root.AddLicenseOption ();
 
-				case "/listcb":
-					ListCacheBlock ( args );
-					return 0;
 
-				case "/unpackcb":
-					UnpackCacheBlock ( args );
-					return 0;
+			var cmdPak = new Command ( "pak" , "Process PAK files" );
+			root.Add ( cmdPak );
 
-				case "/packcb":
-					PackCacheBlock ( args );
-					return 0;
+			var cmdPakPack = new Command ( "pack" , "Pack contents of a directory into a single PAK file" );
+			cmdPakPack.AddArgument ( new Argument<DirectoryInfo> ( "source" , "Path to the directory containing files" ).ExistingOnly () );
+			cmdPakPack.AddArgument ( new Argument<FileInfo> ( "target" , "Path to a PAK file that will be created" ).NonExistingOnly () );
+			cmdPakPack.Handler = CommandHandler.Create<DirectoryInfo , FileInfo> ( DoPakPack );
+			cmdPak.Add ( cmdPakPack );
 
-				case "/zippak":
-					ZipPakHelper.CreatePak ( args[1] , args[2] );
-					return 0;
 
-				case "/listll":
-					ListLoadList ( args[1] );
-					return 0;
+			var cmdCacheBlock = new Command ( "cache_block" , "Process cache_block files" );
+			cmdCacheBlock.AddAlias ( "cb" );
+			root.Add ( cmdCacheBlock );
 
-				case "/listllc":
-					ListLoadListCompact ( args[1] );
-					return 0;
+			var cmdCacheBlockList = new Command ( "list" , "List contents of a cache_block file" );
+			cmdCacheBlockList.AddArgument ( new Argument<FileInfo> ( "source" , "Path to the cache_block file" ).ExistingOnly () );
+			cmdCacheBlockList.Handler = CommandHandler.Create<FileInfo> ( DoCacheBlockList );
+			cmdCacheBlock.Add ( cmdCacheBlockList );
 
-				case "/createll":
-					CreateLoadList ( args[1] , args[2] , args[3] , args[4] );
-					return 0;
+			var cmdCacheBlockUnpack = new Command ( "unpack" , "Unpack contents of a cache_block file into a directory" );
+			cmdCacheBlockUnpack.AddArgument ( new Argument<FileInfo> ( "source" , "Path to the cache_block file" ).ExistingOnly () );
+			cmdCacheBlockUnpack.AddArgument ( new Argument<DirectoryInfo> ( "target" , "Path to a directory that will be created to unpack into" ).NonExistingOnly () );
+			cmdCacheBlockUnpack.Handler = CommandHandler.Create<FileInfo , DirectoryInfo> ( DoCacheBlockUnpack );
+			cmdCacheBlock.Add ( cmdCacheBlockUnpack );
 
-				case "/listsl":
-					ListSoundList ( args[1] );
-					return 0;
+			var cmdCacheBlockPack = new Command ( "pack" , "Pack contents of a directory into a single cache_block file" );
+			cmdCacheBlockPack.AddArgument ( new Argument<DirectoryInfo> ( "source" , "Path to the directory containing files" ).ExistingOnly () );
+			cmdCacheBlockPack.AddArgument ( new Argument<FileInfo> ( "target" , "Path to a cache_block file that will be created" ).NonExistingOnly () );
+			cmdCacheBlockPack.Handler = CommandHandler.Create<DirectoryInfo , FileInfo> ( DoCacheBlockPack );
+			cmdCacheBlock.Add ( cmdCacheBlockPack );
 
-				case "/createsl":
-					CreateSoundList ( args[1] , args[2] );
-					return 0;
 
-				default:
-					PrintHelp ();
-					return 1;
-			}
+			var cmdLoadList = new Command ( "load_list" , "Process load_list files" );
+			cmdLoadList.AddAlias ( "ll" );
+			root.Add ( cmdLoadList );
+
+			var cmdLoadListList = new Command ( "list" , "List contents of a load_list file" );
+			cmdLoadListList.AddOption ( new Option ( "--compact" , "Use compact format (internal names only)" ) );
+			cmdLoadListList.AddArgument ( new Argument<FileInfo> ( "source" , "Path to the load_list file" ).ExistingOnly () );
+			cmdLoadListList.Handler = CommandHandler.Create<FileInfo , bool> ( DoLoadListList );
+			cmdLoadList.Add ( cmdLoadListList );
+
+			var cmdLoadListCreate = new Command ( "create-initial" , "Create load_list file using conventions for initial.pak\\pak.load_list" );
+			cmdLoadListCreate.AddAlias ( "ci" );
+			cmdLoadListCreate.AddArgument ( new Argument<FileInfo> ( "target" , "Path to a load_list file that will be created" ).NonExistingOnly () );
+			cmdLoadListCreate.AddArgument ( new Argument<FileSystemInfo> ( "initial" , "Path to the initial.pak file or a directory with its contents" ).ExistingOnly () );
+			cmdLoadListCreate.AddArgument ( new Argument<FileSystemInfo> ( "shared" , "Path to the shared.pak file or a directory with its contents" ).ExistingOnly () );
+			cmdLoadListCreate.AddArgument ( new Argument<FileSystemInfo> ( "shared_sound" , "Path to the shared_sound.pak file or a directory with its contents" ).ExistingOnly () );
+			cmdLoadListCreate.Handler = CommandHandler.Create<FileInfo , FileSystemInfo , FileSystemInfo , FileSystemInfo> ( DoLoadListCreate );
+			cmdLoadList.Add ( cmdLoadListCreate );
+
+
+			var cmdSoundList = new Command ( "sound_list" , "Process sound_list files" );
+			cmdSoundList.AddAlias ( "sl" );
+			root.Add ( cmdSoundList );
+
+			var cmdSoundListList = new Command ( "list" , "List contents of a sound_list file" );
+			cmdSoundListList.AddArgument ( new Argument<FileInfo> ( "source" , "Path to the sound_list file" ).ExistingOnly () );
+			cmdSoundListList.Handler = CommandHandler.Create<FileInfo> ( DoSoundListList );
+			cmdSoundList.Add ( cmdSoundListList );
+
+			var cmdSoundListCreate = new Command ( "create" , "Create sound_list file" );
+			cmdSoundListCreate.AddArgument ( new Argument<FileSystemInfo> ( "source" , "Path to the PAK file or a directory containing PCM files" ).ExistingOnly () );
+			cmdSoundListCreate.AddArgument ( new Argument<FileInfo> ( "target" , "Path to the sound_list file" ).NonExistingOnly () );
+			cmdSoundListCreate.Handler = CommandHandler.Create<FileSystemInfo , FileInfo> ( DoSoundListCreate );
+			cmdSoundList.Add ( cmdSoundListCreate );
+
+			return root.InvokeWithMiddleware ( args , CommandLineExtensions.MakePrintLicenseResourceMiddleware ( typeof ( Program ) ) );
 		}
 
-		private static void PrintLicense () {
-			using var stream = typeof ( Program ).Assembly.GetManifestResourceStream ( $"{nameof ( SnowPakTool )}.LICENSE" )
-						?? throw new InvalidOperationException ( "Can't find the license resource." );
-			using var reader = new StreamReader ( stream );
-			Console.WriteLine ( reader.ReadToEnd () );
-		}
 
-		private static void ListCacheBlock ( string[] args ) {
-			using ( var stream = File.OpenRead ( args[1] ) ) {
+
+		private static void DoCacheBlockList ( FileInfo source ) {
+			using ( var stream = File.OpenRead ( source.FullName ) ) {
 				var reader = new CacheBlockReader ( stream );
 				Console.WriteLine ( $"File entries: {reader.FileEntries.Length}" );
 				Console.WriteLine ( $"Base offset: {reader.BaseOffset}" );
@@ -85,27 +100,31 @@ namespace SnowPakTool {
 			}
 		}
 
-		private static void UnpackCacheBlock ( string[] args ) {
-			var sourceLocation = Path.GetFullPath ( args[1] );
-			if ( !File.Exists ( sourceLocation ) ) throw new IOException ( $"Can't find cache block file '{sourceLocation}'." );
-			var sourceDirectory = Path.GetDirectoryName ( sourceLocation ); //file exists, so this is neither a null nor root
-			var targetDirectory = args.Length >= 3
-						? Path.GetFullPath ( args[2] )
-						: Path.Combine ( sourceDirectory , Path.GetFileNameWithoutExtension ( sourceLocation ) );
-			if ( Directory.Exists ( targetDirectory ) ) throw new IOException ( $"Target directory '{targetDirectory}' already exists." );
-			using ( var stream = File.OpenRead ( sourceLocation ) ) {
+		private static void DoCacheBlockUnpack ( FileInfo source , DirectoryInfo target ) {
+			using ( var stream = File.OpenRead ( source.FullName ) ) {
 				var reader = new CacheBlockReader ( stream );
-				reader.UnpackAll ( targetDirectory );
+				reader.UnpackAll ( target.FullName );
 			}
 		}
 
-		private static void PackCacheBlock ( string[] args ) {
-			var sourceDirectory = Path.GetFullPath ( args[1] );
-			var targetLocation = args[2];
-			var entries = CacheBlockWriter.GetFileEntries ( sourceDirectory ).OrderBy ( a => a.InternalName ).ToList ();
-			using ( var stream = File.Open ( targetLocation , FileMode.CreateNew , FileAccess.Write , FileShare.Read ) ) {
+		private static void DoCacheBlockPack ( DirectoryInfo source , FileInfo target ) {
+			var entries = CacheBlockWriter.GetFileEntries ( source.FullName ).OrderBy ( a => a.InternalName ).ToList ();
+			using ( var stream = File.Open ( target.FullName , FileMode.CreateNew , FileAccess.Write , FileShare.Read ) ) {
 				var writer = new CacheBlockWriter ( stream );
-				writer.Pack ( sourceDirectory , entries );
+				writer.Pack ( source.FullName , entries );
+			}
+		}
+
+		private static void DoPakPack ( DirectoryInfo source , FileInfo target ) {
+			ZipPakHelper.CreatePak ( source.FullName , target.FullName );
+		}
+
+		private static void DoLoadListList ( FileInfo source , bool compact ) {
+			if ( compact ) {
+				ListLoadListCompact ( source.FullName );
+			}
+			else {
+				ListLoadList ( source.FullName );
 			}
 		}
 
@@ -170,18 +189,18 @@ namespace SnowPakTool {
 			}
 		}
 
-		private static void CreateLoadList ( string loadListLocation , string initialLocation , string sharedLocation , string sharedSoundLocation ) {
-			var initialContainer = FilesContainer.From ( initialLocation );
-			var sharedContainer = FilesContainer.From ( sharedLocation );
-			var sharedSoundContainer = FilesContainer.From ( sharedSoundLocation );
+		private static void DoLoadListCreate ( FileInfo target , FileSystemInfo initial , FileSystemInfo shared , FileSystemInfo shared_sound ) {
+			var initialContainer = FilesContainer.From ( initial.FullName );
+			var sharedContainer = FilesContainer.From ( shared.FullName );
+			var sharedSoundContainer = FilesContainer.From ( shared_sound.FullName );
 			var initialContainerFiles = initialContainer.GetFiles ();
 			var sharedContainerFiles = sharedContainer.GetFiles ();
 			var sharedSoundContainerFiles = sharedSoundContainer.GetFiles ();
-			LoadListFile.WriteFileNames ( loadListLocation , initialContainerFiles , sharedContainerFiles , sharedSoundContainerFiles );
+			LoadListFile.WriteFileNames ( target.FullName , initialContainerFiles , sharedContainerFiles , sharedSoundContainerFiles );
 		}
 
-		private static void ListSoundList ( string soundListLocation ) {
-			var names = SoundListFile.ReadEntries ( soundListLocation ).ToList ();
+		private static void DoSoundListList ( FileInfo source ) {
+			var names = SoundListFile.ReadEntries ( source.FullName ).ToList ();
 			foreach ( var name in names ) {
 				Console.WriteLine ( name );
 			}
@@ -194,30 +213,14 @@ namespace SnowPakTool {
 			}
 		}
 
-		private static void CreateSoundList ( string sourceLocation , string soundListLocation ) {
-			Console.WriteLine ( $"Scanning '{sourceLocation}' for .pcm files." );
-			var sourceContainer = FilesContainer.From ( sourceLocation );
+		private static void DoSoundListCreate ( FileSystemInfo source , FileInfo target ) {
+			Console.WriteLine ( $"Scanning '{source.FullName}' for .pcm files." );
+			var sourceContainer = FilesContainer.From ( source.FullName );
 			var names = sourceContainer.GetFiles ().Where ( a => a.EndsWith ( ".pcm" , StringComparison.OrdinalIgnoreCase ) ).ToList ();
 			Console.WriteLine ( $"{names.Count} .pcm files found." );
 			Console.WriteLine ( "Writing." );
-			SoundListFile.WriteEntries ( soundListLocation , names );
+			SoundListFile.WriteEntries ( target.FullName , names );
 			Console.WriteLine ( "Done." );
-		}
-
-
-
-		private static void PrintHelp () {
-			Console.WriteLine ( "Usage:" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /license" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listcb file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /unpackcb file.cache_block [directory]" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /packcb directory file.cache_block" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /zippak directory file.pak" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listll pak.load_list" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listllc pak.load_list" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /createll pak.load_list initial_pak_or_directory shared_pak_or_directory shared_sound_pak_or_directory" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /listsl sound.sound_list" );
-			Console.WriteLine ( $"  {nameof ( SnowPakTool )} /createsl pak_or_directory sound.sound_list" );
 		}
 
 	}
