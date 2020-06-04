@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using SnowPakTool.Zip;
 
@@ -13,11 +14,9 @@ namespace SnowPakTool {
 
 
 		/// <remarks>
-		/// <see cref="System.IO.Compression.ZipArchive"/> does not support real store (0) method and uses deflate instead.
-		/// This can be worked around by first creating an archive with just the pak.load_list, and then updating it,
-		/// but the update mode runs out of memory with large archives, so it's either large archives without pak.load_list,
-		/// or an ordered with one, but only of a certain size. More than that, large archives that it creates (shared_textures.pak)
-		/// can't be read properly by the game, causing texture corruption inside garage.
+		/// .NET Core version of <see cref="System.IO.Compression.ZipArchive"/> finally supports real store (0) method
+		/// (instead of using deflate as .NET Framework does), although it's single-threaded. The problem is it's still
+		/// unclear which files can be compressed, and which must be stored.
 		/// </remarks>
 		public static void CreatePak ( string sourceDirectory , string pakLocation ) {
 			if ( sourceDirectory is null ) throw new ArgumentNullException ( nameof ( sourceDirectory ) );
@@ -34,13 +33,33 @@ namespace SnowPakTool {
 				Console.WriteLine ( $"WARNING: List file '{listLocation}' does not exist." );
 			}
 
+
 			using ( var zipStream = File.Open ( pakLocation , FileMode.CreateNew , FileAccess.ReadWrite , FileShare.Read ) ) {
+				Console.WriteLine ( $"Scanning: {sourceDirectory}" );
 				var files = GetFiles ( sourceDirectory );
-				StoreFiles ( zipStream , files );
+
+				Console.Write ( "Storing files..." );
+				using ( var zip = new ZipArchive ( zipStream , ZipArchiveMode.Create ) ) {
+					var index = 0;
+					foreach ( var file in files ) {
+						Console.Write ( $"\rAdding file {index + 1}/{files.Count}" );
+						var compress = CanBeCompressed ( index , file.Key );
+						zip.CreateEntryFromFile ( file.Value , file.Key , compress ? CompressionLevel.Optimal : CompressionLevel.NoCompression );
+						index++;
+					}
+				}
 			}
+			Console.WriteLine ();
 			Console.WriteLine ( "Done." );
 		}
 
+
+		public static bool CanBeCompressed ( int index , string internalName ) {
+			return false;
+			//if ( index == 0 && LoadListName.Equals ( internalName , StringComparison.OrdinalIgnoreCase ) ) return false;
+			//if ( internalName.EndsWith ( ".pct_header" , StringComparison.OrdinalIgnoreCase ) ) return false; //these aren't compressed in the original shared_textures.pak, but that's not enough
+			//return true;
+		}
 
 		private static List<KeyValuePair<string , string>> GetFiles ( string location ) {
 			location = IOHelpers.NormalizeDirectory ( location );
