@@ -27,4 +27,15 @@ namespace SnowPakTool.Zip {
 
 	}
 
+	public enum EndOfDirectoryField {
+		Signature,
+		DiskNumber,
+		DirectoryDiskNumber,
+		DiskRecords,
+		TotalRecords,
+		DirectorySize,
+		DirectoryOffset,
+		CommentLength,
+	}
+
 }

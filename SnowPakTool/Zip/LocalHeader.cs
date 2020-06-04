@@ -33,4 +33,18 @@ namespace SnowPakTool.Zip {
 
 	}
 
+	public enum LocalHeaderField {
+		Signature,
+		VersionNeeded,
+		Flags,
+		Compression,
+		Time,
+		Date,
+		Crc32,
+		CompressedSize,
+		UncompressedSize,
+		NameLength,
+		ExtraLength,
+	}
+
 }

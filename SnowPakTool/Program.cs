@@ -4,6 +4,7 @@ using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using SnowPakTool.Zip;
 
 namespace SnowPakTool {
 
@@ -17,6 +18,13 @@ namespace SnowPakTool {
 
 			var cmdPak = new Command ( "pak" , "Process PAK files" );
 			root.Add ( cmdPak );
+
+			var cmdPakList = new Command ( "list" , "List contents of a PAK file" ) { IsHidden = true };
+			cmdPakList.AddArgument ( new Argument<FileInfo> ( "source" , "Path to the PAK file" ).ExistingOnly () );
+			cmdPakList.AddOption ( new Option<LocalHeaderField[]> ( "--local-header" ) { IsHidden = true } ); //uglifies help output
+			cmdPakList.AddOption ( new Option ( "--sort" ) );
+			cmdPakList.Handler = CommandHandler.Create<FileInfo , LocalHeaderField[] , bool> ( DoPakList );
+			cmdPak.Add ( cmdPakList );
 
 			var cmdPakPack = new Command ( "pack" , "Pack contents of a directory into a single PAK file" );
 			cmdPakPack.AddArgument ( new Argument<DirectoryInfo> ( "source" , "Path to the directory containing files" ).ExistingOnly () );
@@ -85,8 +93,6 @@ namespace SnowPakTool {
 			return root.InvokeWithMiddleware ( args , CommandLineExtensions.MakePrintLicenseResourceMiddleware ( typeof ( Program ) ) );
 		}
 
-
-
 		private static void DoCacheBlockList ( FileInfo source ) {
 			using ( var stream = File.OpenRead ( source.FullName ) ) {
 				var reader = new CacheBlockReader ( stream );
@@ -113,6 +119,10 @@ namespace SnowPakTool {
 				var writer = new CacheBlockWriter ( stream );
 				writer.Pack ( source.FullName , entries );
 			}
+		}
+
+		private static void DoPakList ( FileInfo source , LocalHeaderField[] localHeader , bool sort ) {
+			ZipPakHelper.ListPak ( source.FullName , localHeader , sort );
 		}
 
 		private static void DoPakPack ( DirectoryInfo source , FileInfo target ) {

@@ -13,4 +13,9 @@ namespace SnowPakTool.Zip {
 
 	}
 
+	public enum ExtensibleExtraHeaderField {
+		Id,
+		Size,
+	}
+
 }

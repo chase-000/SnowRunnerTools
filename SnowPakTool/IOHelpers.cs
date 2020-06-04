@@ -79,6 +79,19 @@ namespace SnowPakTool {
 			return buffer.GetValueAt<T> ( 0 );
 		}
 
+		public static T ReadValue<T> ( this Stream stream , int offset ) where T : unmanaged {
+			var size = MiscHelpers.SizeOf<T> ();
+			if ( offset < 0 || offset > size ) throw new ArgumentOutOfRangeException ( nameof ( offset ) );
+			var buffer = GetBuffer ( size );
+			Array.Clear ( buffer , 0 , offset );
+			var remainder = size - offset;
+			if ( remainder > 0 ) {
+				var read = stream.Read ( buffer , offset , remainder );
+				if ( read != remainder ) throw new EndOfStreamException ();
+			}
+			return buffer.GetValueAt<T> ( 0 );
+		}
+
 		public static T[] ReadValuesArray<T> ( this Stream stream , int count ) where T : unmanaged {
 			var result = new T[count];
 			for ( int i = 0; i < count; i++ ) {

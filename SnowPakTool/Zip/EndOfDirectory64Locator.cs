@@ -19,4 +19,11 @@ namespace SnowPakTool.Zip {
 
 	}
 
+	public enum EndOfDirectory64LocatorField {
+		Signature,
+		EndOfDirectory64DiskNumber,
+		EndOfDirectory64Offset,
+		TotalDisks,
+	}
+
 }

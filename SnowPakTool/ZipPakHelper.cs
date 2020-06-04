@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using SnowPakTool.Zip;
 
 namespace SnowPakTool {
@@ -53,6 +54,20 @@ namespace SnowPakTool {
 			Console.WriteLine ( "Done." );
 		}
 
+		public static void ListPak ( string pakLocation , LocalHeaderField[] localHeaderFields , bool sort ) {
+			var localHeaderFieldNames = localHeaderFields == null ? null : new HashSet<string> ( localHeaderFields.Select ( a => a.ToString () ) );
+
+			var localHeaders = GetLocalHeaders ( pakLocation );
+			if ( sort ) {
+				localHeaders = localHeaders.OrderBy ( a => a.Name );
+			}
+
+			foreach ( var entry in localHeaders ) {
+				PrintFields ( in entry.LocalHeader , localHeaderFieldNames );
+				Console.Write ( entry.Name );
+				Console.WriteLine ();
+			}
+		}
 
 		public static bool CanBeCompressed ( int index , string internalName ) {
 			return false;
@@ -60,6 +75,8 @@ namespace SnowPakTool {
 			//if ( internalName.EndsWith ( ".pct_header" , StringComparison.OrdinalIgnoreCase ) ) return false; //these aren't compressed in the original shared_textures.pak, but that's not enough
 			//return true;
 		}
+
+
 
 		private static List<KeyValuePair<string , string>> GetFiles ( string location ) {
 			location = IOHelpers.NormalizeDirectory ( location );
@@ -268,6 +285,62 @@ namespace SnowPakTool {
 			else {
 				legacy = (ushort) value;
 				return true;
+			}
+		}
+
+		private static void PrintFields<T> ( in T structure , ISet<string> fieldNames ) {
+			var fields = typeof ( T ).GetFields ();
+			foreach ( var field in fields ) {
+				if ( fieldNames == null || fieldNames.Contains ( field.Name ) ) {
+					int size;
+					object value;
+					if ( field.FieldType.IsEnum ) {
+						var type = Enum.GetUnderlyingType ( field.FieldType );
+						size = Marshal.SizeOf ( type );
+						value = Convert.ChangeType ( field.GetValue ( structure ) , type );
+					}
+					else {
+						size = Marshal.SizeOf ( field.FieldType );
+						value = field.GetValue ( structure );
+					}
+					Console.Write ( $"{{0:X{size * 2}}}|" , value );
+				}
+			}
+		}
+
+		private static IEnumerable<(LocalHeader LocalHeader, string Name, List<ExtensibleExtraZip64> Extras)> GetLocalHeaders ( string pakLocation ) {
+			using var zip = File.OpenRead ( pakLocation );
+			for ( long i = 0; ; i++ ) {
+				var signature = zip.ReadInt32 ();
+				if ( signature != LocalHeader.DefaultSignature ) break;
+				var header = zip.ReadValue<LocalHeader> ( 4 );
+				header.Signature = signature;
+
+				ulong compressedSize = header.CompressedSize;
+				var name = zip.ReadString ( header.NameLength );
+
+				List<ExtensibleExtraZip64> extras = null;
+				for ( int extraLength = header.ExtraLength; extraLength > 0; ) {
+					var extraHeader = zip.ReadValue<ExtensibleExtraHeader> ();
+					if ( extraHeader.Id == ExtensibleExtraId.Zip64 ) {
+						Console.Write ( $",{(int) extraHeader.Id:X4},{extraHeader.Size:X4}" );
+						var eez = new ExtensibleExtraZip64 ();
+						if ( header.UncompressedSize == 0xFFFF_FFFF ) {
+							eez.UncompressedSize = zip.ReadValue<ulong> ();
+						}
+						if ( header.CompressedSize == 0xFFFF_FFFF ) {
+							eez.CompressedSize = compressedSize = zip.ReadValue<ulong> ();
+						}
+						extraLength -= MiscHelpers.SizeOf<ExtensibleExtraHeader> () + extraHeader.Size;
+					}
+					else {
+						zip.Position += extraHeader.Size;
+					}
+				}
+
+				yield return (header, name, extras);
+
+				zip.Position += (long) compressedSize;
 			}
 		}
 
