@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowPakTool", "SnowPakTool\SnowPakTool.csproj", "{491AAEB0-613A-4A27-BFCD-69C2480D13C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnowPakTool", "SnowPakTool\SnowPakTool.csproj", "{491AAEB0-613A-4A27-BFCD-69C2480D13C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowTruckConfig", "SnowTruckConfig\SnowTruckConfig.csproj", "{53841067-66D5-48A0-93C9-4C193D78EEA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnowTruckConfig", "SnowTruckConfig\SnowTruckConfig.csproj", "{53841067-66D5-48A0-93C9-4C193D78EEA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnowTruckConfig.Tests", "SnowTruckConfig.Tests\SnowTruckConfig.Tests.csproj", "{F6E52A0E-D2FD-404F-AC39-CDD6B23436AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{53841067-66D5-48A0-93C9-4C193D78EEA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53841067-66D5-48A0-93C9-4C193D78EEA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53841067-66D5-48A0-93C9-4C193D78EEA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6E52A0E-D2FD-404F-AC39-CDD6B23436AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6E52A0E-D2FD-404F-AC39-CDD6B23436AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6E52A0E-D2FD-404F-AC39-CDD6B23436AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6E52A0E-D2FD-404F-AC39-CDD6B23436AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

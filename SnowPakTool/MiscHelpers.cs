@@ -64,6 +64,13 @@ namespace SnowPakTool {
 			}
 		}
 
+		public static int ComputeUtf8Crc32 ( string value ) {
+			using var hasher = new Crc32Managed ();
+			var hash = hasher.ComputeHash ( Encoding.UTF8.GetBytes ( value ) );
+			return ( hash[0] << 24 ) | ( hash[1] << 16 ) | ( hash[2] << 8 ) | hash[3];
+		}
+
+
 		internal static void Assert ( bool value ) {
 			if ( !value ) throw new InvalidOperationException ();
 		}

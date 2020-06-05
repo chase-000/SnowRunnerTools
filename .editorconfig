@@ -171,3 +171,6 @@ dotnet_diagnostic.S907.severity = silent
 
 # S1128: Unused "using" should be removed
 dotnet_diagnostic.S1128.severity = silent
+
+# S1854: Unused assignments should be removed //sonarlint doesn't understand ranges as of 2020-06-05
+dotnet_diagnostic.S1854.severity = silent
