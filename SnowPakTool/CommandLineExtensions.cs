@@ -17,8 +17,9 @@ namespace SnowPakTool {
 		public static string LicenseOptionName => "--license";
 
 
-		public static Argument<DirectoryInfo> NonExistingOnly ( this Argument<DirectoryInfo> argument ) {
+		public static Argument<DirectoryInfo> NonExistingOnly ( this Argument<DirectoryInfo> argument , Func<ArgumentResult , bool> unless = null ) {
 			argument.AddValidator ( symbol =>
+				unless != null && unless ( symbol ) ? null :
 				symbol.Tokens
 					.Select ( a => a.Value )
 					.Where ( a => Directory.Exists ( a ) )
@@ -26,6 +27,10 @@ namespace SnowPakTool {
 					.FirstOrDefault ()
 			);
 			return argument;
+		}
+
+		public static Argument<DirectoryInfo> NonExistingOnly ( this Argument<DirectoryInfo> argument , Option unless ) {
+			return argument.NonExistingOnly ( symbol => symbol.Parent.Children.OfType<OptionResult> ().Any ( a => unless.HasAlias ( a.Token.Value ) ) );
 		}
 
 		public static Argument<FileInfo> NonExistingOnly ( this Argument<FileInfo> argument ) {

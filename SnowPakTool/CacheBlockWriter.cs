@@ -10,15 +10,23 @@ namespace SnowPakTool {
 		public CacheBlockWriter ( Stream stream ) : base ( stream ) {
 		}
 
-		public static IEnumerable<CacheBlockFileFileEntry> GetFileEntries ( string directory ) {
+		public static IEnumerable<CacheBlockFileFileEntry> GetFileEntries ( string directory , bool mixed ) {
 			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
 			directory = IOHelpers.NormalizeDirectory ( directory );
 			if ( !Directory.Exists ( directory ) ) throw new DirectoryNotFoundException ( $"Source directory '{directory}' does not exist." );
-			if ( Directory.EnumerateFiles ( directory , "*" ).Any () ) throw new IOException ( $"Source directory '{directory}' has files in it. It should only contain directories." );
-			return Directory
-				.EnumerateFiles ( directory , "*" , SearchOption.AllDirectories )
-				.Select ( a => CacheBlockFileFileEntry.FromExternalName ( a.Substring ( directory.Length ) ) )
-				;
+			IEnumerable<string> files;
+			if ( mixed ) {
+				files = InitialCacheBlockDirectories
+					.Select ( a => Path.Combine ( directory , a ) )
+					.Where ( Directory.Exists )
+					.SelectMany ( a => Directory.EnumerateFiles ( a , "*" , SearchOption.AllDirectories ) )
+					;
+			}
+			else {
+				if ( Directory.EnumerateFiles ( directory , "*" ).Any () ) throw new IOException ( $"Source directory '{directory}' has files in it. It should only contain directories." );
+				files = Directory.EnumerateFiles ( directory , "*" , SearchOption.AllDirectories );
+			}
+			return files.Select ( a => CacheBlockFileFileEntry.FromExternalName ( a.Substring ( directory.Length ) ) );
 		}
 
 		public void Pack ( string sourceDirectory , IReadOnlyCollection<CacheBlockFileFileEntry> entries ) {

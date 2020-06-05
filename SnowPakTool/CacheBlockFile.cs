@@ -21,6 +21,10 @@ namespace SnowPakTool {
 			00000030:  20 20 20 20-00 00 00 00-00 00 00 00-00 00 00 00
 		*/
 
+		public static string InitialCacheBlockName => "initial.cache_block";
+
+		public static string[] InitialCacheBlockDirectories { get; } = new[] { "[ps]" , "[ps_common]" , "[strings]" };
+
 
 		protected CacheBlockFile ( Stream stream ) {
 			if ( stream == null ) throw new ArgumentNullException ( nameof ( stream ) );

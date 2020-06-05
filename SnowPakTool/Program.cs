@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
@@ -29,7 +30,8 @@ namespace SnowPakTool {
 			var cmdPakPack = new Command ( "pack" , "Pack contents of a directory into a single PAK file" );
 			cmdPakPack.AddArgument ( new Argument<DirectoryInfo> ( "source" , "Path to the directory containing files" ).ExistingOnly () );
 			cmdPakPack.AddArgument ( new Argument<FileInfo> ( "target" , "Path to a PAK file that will be created" ).NonExistingOnly () );
-			cmdPakPack.Handler = CommandHandler.Create<DirectoryInfo , FileInfo> ( DoPakPack );
+			cmdPakPack.AddOption ( new Option ( "--mixed-cache-block" , "Indicates the source directory contains mixed contents of initial.pak and initial.pak\\initial.cache_block" ) );
+			cmdPakPack.Handler = CommandHandler.Create<DirectoryInfo , FileInfo , bool> ( DoPakPack );
 			cmdPak.Add ( cmdPakPack );
 
 
@@ -43,15 +45,18 @@ namespace SnowPakTool {
 			cmdCacheBlock.Add ( cmdCacheBlockList );
 
 			var cmdCacheBlockUnpack = new Command ( "unpack" , "Unpack contents of a cache_block file into a directory" );
+			var cmdCacheBlockUnpack_AllowMixing = new Option ( "--allow-mixing" , "Allow mixing of contents for initial.pak and initial.pak\\initial.cache_block" );
 			cmdCacheBlockUnpack.AddArgument ( new Argument<FileInfo> ( "source" , "Path to the cache_block file" ).ExistingOnly () );
-			cmdCacheBlockUnpack.AddArgument ( new Argument<DirectoryInfo> ( "target" , "Path to a directory that will be created to unpack into" ).NonExistingOnly () );
-			cmdCacheBlockUnpack.Handler = CommandHandler.Create<FileInfo , DirectoryInfo> ( DoCacheBlockUnpack );
+			cmdCacheBlockUnpack.AddArgument ( new Argument<DirectoryInfo> ( "target" , "Path to a directory that will be created to unpack into" ).NonExistingOnly ( unless: cmdCacheBlockUnpack_AllowMixing ) );
+			cmdCacheBlockUnpack.AddOption ( cmdCacheBlockUnpack_AllowMixing );
+			cmdCacheBlockUnpack.Handler = CommandHandler.Create<FileInfo , DirectoryInfo , bool> ( DoCacheBlockUnpack );
 			cmdCacheBlock.Add ( cmdCacheBlockUnpack );
 
 			var cmdCacheBlockPack = new Command ( "pack" , "Pack contents of a directory into a single cache_block file" );
 			cmdCacheBlockPack.AddArgument ( new Argument<DirectoryInfo> ( "source" , "Path to the directory containing files" ).ExistingOnly () );
 			cmdCacheBlockPack.AddArgument ( new Argument<FileInfo> ( "target" , "Path to a cache_block file that will be created" ).NonExistingOnly () );
-			cmdCacheBlockPack.Handler = CommandHandler.Create<DirectoryInfo , FileInfo> ( DoCacheBlockPack );
+			cmdCacheBlockPack.AddOption ( new Option ( "--mixed-cache-block" , "Indicates the source directory contains mixed contents of initial.pak and initial.pak\\initial.cache_block" ) );
+			cmdCacheBlockPack.Handler = CommandHandler.Create<DirectoryInfo , FileInfo , bool> ( DoCacheBlockPack );
 			cmdCacheBlock.Add ( cmdCacheBlockPack );
 
 
@@ -106,15 +111,15 @@ namespace SnowPakTool {
 			}
 		}
 
-		private static void DoCacheBlockUnpack ( FileInfo source , DirectoryInfo target ) {
+		private static void DoCacheBlockUnpack ( FileInfo source , DirectoryInfo target , bool allowMixing ) {
 			using ( var stream = File.OpenRead ( source.FullName ) ) {
 				var reader = new CacheBlockReader ( stream );
 				reader.UnpackAll ( target.FullName );
 			}
 		}
 
-		private static void DoCacheBlockPack ( DirectoryInfo source , FileInfo target ) {
-			var entries = CacheBlockWriter.GetFileEntries ( source.FullName ).OrderBy ( a => a.InternalName ).ToList ();
+		private static void DoCacheBlockPack ( DirectoryInfo source , FileInfo target , bool mixedCacheBlock ) {
+			var entries = CacheBlockWriter.GetFileEntries ( source.FullName , mixedCacheBlock ).OrderBy ( a => a.InternalName ).ToList ();
 			using ( var stream = File.Open ( target.FullName , FileMode.CreateNew , FileAccess.Write , FileShare.Read ) ) {
 				var writer = new CacheBlockWriter ( stream );
 				writer.Pack ( source.FullName , entries );
@@ -125,8 +130,27 @@ namespace SnowPakTool {
 			ZipPakHelper.ListPak ( source.FullName , localHeader , sort );
 		}
 
-		private static void DoPakPack ( DirectoryInfo source , FileInfo target ) {
-			ZipPakHelper.CreatePak ( source.FullName , target.FullName );
+		private static void DoPakPack ( DirectoryInfo source , FileInfo target , bool mixedCacheBlock ) {
+			string tmp = null;
+			try {
+				IEnumerable<KeyValuePair<string , string>> additionalFiles = null;
+				if ( mixedCacheBlock ) {
+					tmp = Path.Combine ( Path.GetTempPath () , Path.GetRandomFileName () );
+					DoCacheBlockPack ( source , new FileInfo ( tmp ) , true );
+					additionalFiles = new[] { new KeyValuePair<string , string> ( CacheBlockFile.InitialCacheBlockName , tmp ) };
+				}
+				ZipPakHelper.CreatePak ( source.FullName , target.FullName , CacheBlockFile.InitialCacheBlockDirectories , additionalFiles );
+			}
+			finally {
+				if ( tmp != null ) {
+					try {
+						File.Delete ( tmp );
+					}
+					catch {
+						//NOP
+					}
+				}
+			}
 		}
 
 		private static void DoLoadListList ( FileInfo source , bool compact ) {

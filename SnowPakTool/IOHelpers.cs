@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SnowPakTool {
 
@@ -155,6 +157,24 @@ namespace SnowPakTool {
 			hasher.TransformFinalBlock ( __Buffer , 0 , 0 );
 			return ( hasher.Hash[0] << 24 ) | ( hasher.Hash[1] << 16 ) | ( hasher.Hash[2] << 8 ) | hasher.Hash[3];
 		}
+
+		public static IEnumerable<KeyValuePair<string , string>> GetRelativeAndFullNames ( string location , IEnumerable<string> excludedDirectories = null ) {
+			location = NormalizeDirectory ( location );
+			IEnumerable<string> files;
+			if ( excludedDirectories == null ) {
+				files = Directory.EnumerateFiles ( location , "*" , SearchOption.AllDirectories );
+			}
+			else {
+				var excluded = new HashSet<string> ( excludedDirectories , StringComparer.OrdinalIgnoreCase );
+				files = Directory.EnumerateFiles ( location , "*" ).Concat (
+					Directory.EnumerateDirectories ( location )
+						.Where ( a => !excluded.Contains ( Path.GetFileName ( a ) ) )
+						.SelectMany ( a => Directory.EnumerateFiles ( a , "*" , SearchOption.AllDirectories ) )
+				);
+			}
+			return files.Select ( a => new KeyValuePair<string , string> ( a.Substring ( location.Length ) , a ) );
+		}
+
 
 
 		private static byte[] GetBuffer ( int length ) {

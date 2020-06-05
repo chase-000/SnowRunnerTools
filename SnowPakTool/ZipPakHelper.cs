@@ -19,7 +19,7 @@ namespace SnowPakTool {
 		/// (instead of using deflate as .NET Framework does), although it's single-threaded. The problem is it's still
 		/// unclear which files can be compressed, and which must be stored.
 		/// </remarks>
-		public static void CreatePak ( string sourceDirectory , string pakLocation ) {
+		public static void CreatePak ( string sourceDirectory , string pakLocation , IEnumerable<string> excludedDirectories = null , IEnumerable<KeyValuePair<string , string>> additionalFiles = null ) {
 			if ( sourceDirectory is null ) throw new ArgumentNullException ( nameof ( sourceDirectory ) );
 			if ( pakLocation is null ) throw new ArgumentNullException ( nameof ( pakLocation ) );
 
@@ -27,17 +27,17 @@ namespace SnowPakTool {
 
 			sourceDirectory = IOHelpers.NormalizeDirectory ( sourceDirectory );
 			if ( !Directory.Exists ( sourceDirectory ) ) throw new IOException ( $"Source directory '{sourceDirectory}' does not exist." );
-
-			var listLocation = Path.Combine ( sourceDirectory , LoadListName );
-			var loadListExists = File.Exists ( listLocation );
-			if ( !loadListExists ) {
-				Console.WriteLine ( $"WARNING: List file '{listLocation}' does not exist." );
+			if ( !File.Exists ( Path.Combine ( sourceDirectory , LoadListName ) ) ) {
+				Console.WriteLine ( $"WARNING: {LoadListName} does not exist." );
 			}
-
 
 			using ( var zipStream = File.Open ( pakLocation , FileMode.CreateNew , FileAccess.ReadWrite , FileShare.Read ) ) {
 				Console.WriteLine ( $"Scanning: {sourceDirectory}" );
-				var files = GetFiles ( sourceDirectory );
+				var files = IOHelpers.GetRelativeAndFullNames ( sourceDirectory , excludedDirectories )
+					.Concat ( additionalFiles ?? Enumerable.Empty<KeyValuePair<string , string>> () )
+					.OrderBy ( a => a.Key , PakableFileNameComparer.Instance ) //The list file must be the first file in the archive, stored without compression.
+					.ToList ()
+					;
 
 				Console.Write ( "Storing files..." );
 				using ( var zip = new ZipArchive ( zipStream , ZipArchiveMode.Create ) ) {
@@ -77,16 +77,6 @@ namespace SnowPakTool {
 		}
 
 
-
-		private static List<KeyValuePair<string , string>> GetFiles ( string location ) {
-			location = IOHelpers.NormalizeDirectory ( location );
-			var files = Directory.EnumerateFiles ( location , "*" , SearchOption.AllDirectories );
-			return files
-				.Select ( a => new KeyValuePair<string , string> ( a.Substring ( location.Length ) , a ) )
-				.OrderBy ( a => a.Key , PakableFileNameComparer.Instance ) //The list file must be the first file in the archive, stored without compression.
-				.ToList ()
-				;
-		}
 
 		private static void StoreFiles ( Stream zipStream , IReadOnlyList<KeyValuePair<string , string>> files ) {
 			var isZip64 = false;
