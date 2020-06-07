@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\LICENSE">
+    <EmbeddedResource Include="..\..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </EmbeddedResource>
