@@ -1,0 +1,9 @@
+--- mr_slot_camera.org.sso	Sun May 24 16:56:10 2020
++++ mr_slot_camera.sso	Sun May 24 17:02:55 2020
+@@ -1,5 +1,5 @@
+ nearPlane   =   4
+-fov   =   30
++fov   =   35
+ cameraOffset   =   {
+    x   =   -4.1
+    y   =   1.5

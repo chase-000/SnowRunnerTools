@@ -1,0 +1,9 @@
+--- D:\Games\SnowRunner_backs\mods\basis-002\[ps]\game_mode_base.sso	Sun Jun 07 16:06:35 2020
++++ D:\Games\SnowRunner_backs\mods\.staging\initial-pak\[ps]\game_mode_base.sso	Sun Jun 07 15:12:41 2020
+@@ -1,5 +1,5 @@
+ setting   =   {
+-   isAllContentUnlocked   =   False
++   isAllContentUnlocked   =   True
+    isRegionMapEnabled   =   True
+    isRecoverEnabled   =   True
+    __type   =   "GameSystemsSetting"
