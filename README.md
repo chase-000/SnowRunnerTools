@@ -17,7 +17,7 @@ set client=D:\Games\SnowRunner\en_us\preload\paks\client
 
 7z x -o"initial_pak" "%client%\initial.pak"
 snowpaktool cb unpack initial_pak\initial.cache_block initial_cache_block
-patch -u -i ui_settings_controller.sso.diff initial_cache_block\[ps]\ui_settings_controller.sso
+patch -u -i mods\fov_sliders_180.diff initial_cache_block\[ps]\ui_settings_controller.sso
 del initial_pak\initial.cache_block
 snowpaktool cb pack initial_cache_block initial_pak\initial.cache_block
 del "%client%\initial.pak"
