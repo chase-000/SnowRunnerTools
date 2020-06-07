@@ -67,18 +67,18 @@ namespace SnowTruckConfig {
 		}
 
 		private static void DoExtrasRenameTires ( DirectoryInfo directory , GameLanguage language ) {
-			Console.WriteLine ( "Reading templates." );
-			var templates = XmlHelpers.ReadFragments ( Path.Combine ( directory.FullName , @"[media]\_templates\trucks.xml" ) )
+			Console.WriteLine ( "Reading global friction templates." );
+			var globalFrictionTemplates = XmlHelpers.ReadFragments ( Path.Combine ( directory.FullName , @"[media]\_templates\trucks.xml" ) )
 				.Element ( "_templates" )
 				.Element ( "WheelFriction" )
 				.Elements ()
-				.Select ( a => new TireInfo ( a.Name.LocalName , a ) )
+				.Select ( a => new TireFriction ( a.Name.LocalName , a ) )
 				.ToDictionary ( a => a.Id )
 				;
-			Console.WriteLine ( $"{templates.Count} entries read." );
+			Console.WriteLine ( $"{globalFrictionTemplates.Count} entries read." );
 
 			Console.WriteLine ( "Reading tires and issuing new IDs." );
-			var tires = PrepareAndGetTires ( directory , templates );
+			var tires = PrepareAndGetTires ( directory , globalFrictionTemplates );
 			Console.WriteLine ( $"{tires.Count} new tire name IDs created." );
 
 			Console.WriteLine ( $"Reading localization strings for: {language}." );
@@ -105,31 +105,40 @@ namespace SnowTruckConfig {
 			Console.WriteLine ( "Done." );
 		}
 
-		private static List<TireInfo> PrepareAndGetTires ( DirectoryInfo directory , Dictionary<string , TireInfo> templates ) {
+		private static List<TireFriction> PrepareAndGetTires ( DirectoryInfo directory , Dictionary<string , TireFriction> globalFrictionTemplates ) {
 			var directoryLocation = IOHelpers.NormalizeDirectory ( directory.FullName );
 			var xmlLocations = Directory.EnumerateFiles ( Path.Combine ( directoryLocation , @"[media]\classes\wheels" ) , "*.xml" );
-			var newTires = new List<TireInfo> ();
+			var newTires = new List<TireFriction> ();
 
 			foreach ( var xmlLocation in xmlLocations ) {
 				var crc = MiscHelpers.ComputeUtf8Crc32 ( xmlLocation[directoryLocation.Length..] );
 				var root = XmlHelpers.ReadFragments ( xmlLocation );
+
+				var templates = new Dictionary<string , TireFriction> ( globalFrictionTemplates );
+				var localTemplateElements = root.Element ( "_templates" )?.Elements ( "TruckTire" ).Elements ().Elements ( "WheelFriction" );
+				if ( localTemplateElements != null ) {
+					foreach ( var item in localTemplateElements ) {
+						var id = item.Parent.Name.LocalName;
+						templates[id] = new TireFriction ( id , item , templates[item.Attribute ( "_template" ).Value] );
+					}
+				}
+
 				var tires = root.Elements ( "TruckWheels" ).Elements ( "TruckTires" ).Elements ( "TruckTire" ).ToList ();
 				if ( tires.Count == 0 ) continue;
 
 				foreach ( var tire in tires ) {
 					var id = tire.Element ( "GameData" )?.Element ( "UiDesc" )?.Attribute ( "UiName" );
 					if ( id == null ) continue;
-					var friction = tire.Element ( "WheelFriction" );
-					if ( friction == null ) continue;
 
 					var match = __NewTireIdName.Match ( id.Value );
 					var originalId = match.Success ? match.Groups[1].Value : id.Value;
 					var newId = $"{originalId}_X_{crc:X8}"; //generate new ids to make them unique (there are duplicates in original files)
 					id.Value = newId;
 
-					var template = friction.Attribute ( "_template" )?.Value;
-					var templateValues = template == null ? null : templates[template];
-					newTires.Add ( new TireInfo ( originalId , newId , friction , templateValues ) );
+					var localFriction = tire.Element ( "WheelFriction" );
+					var templateId = localFriction?.Attribute ( "_template" )?.Value ?? tire?.Attribute ( "_template" )?.Value;
+					var template = templateId == null ? null : templates[templateId];
+					newTires.Add ( new TireFriction ( originalId , newId , localFriction , template ) );
 				}
 				XmlHelpers.WriteFragments ( xmlLocation , root.Nodes () );
 			}
@@ -137,21 +146,24 @@ namespace SnowTruckConfig {
 			return newTires;
 		}
 
-		private static string GetNewTireName ( string originalName , TireInfo tire ) {
-			return $"{originalName} A{tire.Asphalt:0.#}/D{tire.Dirt:0.#}/M{tire.Mud:0.#}";
+		private static string GetNewTireName ( string originalName , TireFriction tire ) {
+			return $"{originalName} {tire}";
 		}
 
-		private sealed class TireInfo {
+		private sealed class TireFriction {
 
-			public TireInfo ( string id , string newId , XElement element , TireInfo template ) {
+			public TireFriction ( string id , string newId , XElement element , TireFriction template ) {
 				Id = id;
 				NewId = newId;
-				Dirt = float.TryParse ( element.Attribute ( "BodyFriction" )?.Value , out var dirt ) ? dirt : template?.Dirt ?? 0;
-				Mud = float.TryParse ( element.Attribute ( "SubstanceFriction" )?.Value , out var mud ) ? mud : template?.Mud ?? 0;
-				Asphalt = float.TryParse ( element.Attribute ( "BodyFrictionAsphalt" )?.Value , out var asphalt ) ? asphalt : template?.Asphalt ?? 0;
+				Dirt = float.TryParse ( element?.Attribute ( "BodyFriction" )?.Value , out var dirt ) ? dirt : template?.Dirt ?? 0;
+				Mud = float.TryParse ( element?.Attribute ( "SubstanceFriction" )?.Value , out var mud ) ? mud : template?.Mud ?? 0;
+				Asphalt = float.TryParse ( element?.Attribute ( "BodyFrictionAsphalt" )?.Value , out var asphalt ) ? asphalt : template?.Asphalt ?? 0;
 			}
 
-			public TireInfo ( string id , XElement element ) : this ( id , null , element , null ) {
+			public TireFriction ( string id , XElement element ) : this ( id , null , element , null ) {
+			}
+
+			public TireFriction ( string id , XElement element , TireFriction template ) : this ( id , null , element , template ) {
 			}
 
 			public string Id { get; }
@@ -159,6 +171,10 @@ namespace SnowTruckConfig {
 			public float Dirt { get; }
 			public float Mud { get; }
 			public float Asphalt { get; }
+
+			public override string ToString () {
+				return $"A{Asphalt:0.#}/D{Dirt:0.#}/M{Mud:0.#}";
+			}
 
 		}
 
