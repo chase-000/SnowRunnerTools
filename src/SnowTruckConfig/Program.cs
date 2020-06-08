@@ -36,11 +36,24 @@ namespace SnowTruckConfig {
 			cmdExtras.Add ( cmdExtrasRename );
 
 			var cmdExtrasRenameTires = new Command ( "tires" , "Rename tires" );
-			cmdExtrasRenameTires.AddOption ( new Option<GameLanguage> ( "--language" ) { Required = true } );
-			cmdExtrasRenameTires.AddArgument ( new Argument<DirectoryInfo> ( "directory" , "Path to the directory with mixed contents of initial.pak and initial.pak\\initial.cache_block" ).ExistingOnly () );
+			var languageOption = new Option<GameLanguage> ( "--language" ) { Required = true };
+			cmdExtrasRenameTires.AddOption ( languageOption );
+			var directoryArgument = new Argument<DirectoryInfo> ( "directory" , "Path to the directory with mixed contents of initial.pak and initial.pak\\initial.cache_block" ).ExistingOnly ();
+			cmdExtrasRenameTires.AddArgument ( directoryArgument );
 			cmdExtrasRenameTires.Handler = CommandHandler.Create<DirectoryInfo , GameLanguage> ( ExtrasRenamer.RenameTires );
 			cmdExtrasRename.Add ( cmdExtrasRenameTires );
 
+			var cmdExtrasRenameTrucks = new Command ( "trucks" , "Rename trucks" );
+			cmdExtrasRenameTrucks.AddOption ( languageOption );
+			cmdExtrasRenameTrucks.AddArgument ( directoryArgument );
+			cmdExtrasRenameTrucks.Handler = CommandHandler.Create<DirectoryInfo , GameLanguage> ( ExtrasRenamer.RenameTrucks );
+			cmdExtrasRename.Add ( cmdExtrasRenameTrucks );
+
+			var cmdExtrasRenameEngines = new Command ( "engines" , "Rename engines" );
+			cmdExtrasRenameEngines.AddOption ( languageOption );
+			cmdExtrasRenameEngines.AddArgument ( directoryArgument );
+			cmdExtrasRenameEngines.Handler = CommandHandler.Create<DirectoryInfo , GameLanguage> ( ExtrasRenamer.RenameEngines );
+			cmdExtrasRename.Add ( cmdExtrasRenameEngines );
 
 			return root.InvokeWithMiddleware ( args , CommandLineExtensions.MakePrintLicenseResourceMiddleware ( typeof ( Program ) ) );
 		}

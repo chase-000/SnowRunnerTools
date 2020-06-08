@@ -10,9 +10,12 @@ namespace SnowTruckConfig {
 
 	public static class ExtrasRenamer {
 
-		public static Regex RenamedStringIdRegex { get; } = new Regex ( @"^(.+?)_X_[0-9A-F]{8}$" , RegexOptions.Compiled );
+		public static Regex RenamedStringIdRegex { get; } = new Regex ( @"^(.+?)_96FD3B99_[0-9A-F]{8}$" , RegexOptions.Compiled );
 
 
+		/// <summary>
+		/// Rename all tires (wheels) to include their friction stats in the name.
+		/// </summary>
 		public static void RenameTires ( DirectoryInfo directory , GameLanguage language ) {
 			Console.WriteLine ( "Reading global friction templates." );
 			var globalFrictionTemplates = XmlHelpers.ReadFragments ( Path.Combine ( directory.FullName , @"[media]\_templates\trucks.xml" ) )
@@ -28,7 +31,6 @@ namespace SnowTruckConfig {
 			var tires = PrepareAndGetTires ( directory , globalFrictionTemplates );
 			Console.WriteLine ( $"{tires.Count} new tire name IDs created." );
 
-			Console.WriteLine ( $"Reading localization strings for: {language}." );
 			var strings = GetStrings ( directory , language , out var stringsMap , out var stringsLocation );
 
 			Console.WriteLine ( "Creating new tire names." );
@@ -39,21 +41,87 @@ namespace SnowTruckConfig {
 				;
 
 			Console.WriteLine ( $"Writing localization strings." );
-			var newStrings = strings
-				.Concat ( newTireNames )
-				;
-			StringsFile.WriteStrings ( stringsLocation , newStrings , overwrite: true );
+			AddRenamingStrings ( strings , newTireNames );
+			StringsFile.WriteStrings ( stringsLocation , strings , overwrite: true );
+			Console.WriteLine ( "Done." );
+		}
+
+		/// <summary>
+		/// Rename all trucks to include their mass in the name.
+		/// </summary>
+		public static void RenameTrucks ( DirectoryInfo directory , GameLanguage language ) {
+			var directoryLocation = IOHelpers.NormalizeDirectory ( directory.FullName );
+			var strings = GetStrings ( directory , language , out var stringsMap , out var stringsLocation );
+
+			Console.WriteLine ( "Processing trucks data." );
+			var newTruckNames = new List<KeyValuePair<string , string>> ();
+			var trucks = Directory.EnumerateFiles ( Path.Combine ( directoryLocation , @"[media]\classes\trucks" ) , "*.xml" );
+			foreach ( var truckXmlLocation in trucks ) {
+				var root = XmlHelpers.ReadFragments ( truckXmlLocation );
+				var nameIdNode = root.Element ( "Truck" )?.Element ( "GameData" )?.Element ( "UiDesc" )?.Attribute ( "UiName" );
+				var nameId = nameIdNode?.Value;
+				if ( nameId == null ) continue;
+				var originalId = GetOriginalId ( nameId );
+				var mass = root.Element ( "Truck" ).Element ( "PhysicsModel" )?.Descendants ( "Body" ).Attributes ( "Mass" )
+					.Select ( a => float.TryParse ( a.Value , out var f ) ? f : 0 )
+					.Sum ()
+					;
+				if ( mass < 100 ) continue;
+
+				var newId = GetNewId ( originalId , truckXmlLocation[directoryLocation.Length..] );
+				nameIdNode.Value = newId;
+				newTruckNames.Add ( Pair.From ( newId , $"{stringsMap[originalId]} | {mass / 1000:0.#}t" ) );
+
+				XmlHelpers.WriteFragments ( truckXmlLocation , root.Nodes () );
+			}
+
+			Console.WriteLine ( $"Writing localization strings." );
+			AddRenamingStrings ( strings , newTruckNames );
+			StringsFile.WriteStrings ( stringsLocation , strings , overwrite: true );
+			Console.WriteLine ( "Done." );
+		}
+
+		/// <summary>
+		/// Rename all trucks to include their torque and fuel consumption in the name. Both of these look like arbitrary in-game units.
+		/// </summary>
+		public static void RenameEngines ( DirectoryInfo directory , GameLanguage language ) {
+			var directoryLocation = IOHelpers.NormalizeDirectory ( directory.FullName );
+			var strings = GetStrings ( directory , language , out var stringsMap , out var stringsLocation );
+
+			Console.WriteLine ( "Processing engines data." );
+			var newEngineNames = new List<KeyValuePair<string , string>> ();
+			var engines = Directory.EnumerateFiles ( Path.Combine ( directoryLocation , @"[media]\classes\engines" ) , "*.xml" );
+			foreach ( var engineXmlLocation in engines ) {
+				var root = XmlHelpers.ReadFragments ( engineXmlLocation );
+				var engineNodes = root.Elements ( "EngineVariants" ).Elements ( "Engine" ); //ignore templates: no original file has any torque/fuel values there
+				foreach ( var engineNode in engineNodes ) {
+					var nameIdNode = engineNode.Element ( "GameData" )?.Element ( "UiDesc" )?.Attribute ( "UiName" );
+					var nameId = nameIdNode?.Value;
+					if ( nameId == null ) continue;
+					var originalId = GetOriginalId ( nameId );
+					var fuelConsumption = (string) engineNode.Attribute ( "FuelConsumption" ) ?? "?";
+					float.TryParse ( (string) engineNode.Attribute ( "Torque" ) , out var torque );
+
+					var newId = GetNewId ( originalId , engineXmlLocation[directoryLocation.Length..] );
+					nameIdNode.Value = newId;
+					newEngineNames.Add ( Pair.From ( newId , $"{stringsMap[originalId]} | {fuelConsumption}/{torque / 1000:0.#}k" ) );
+				}
+				XmlHelpers.WriteFragments ( engineXmlLocation , root.Nodes () );
+			}
+
+			Console.WriteLine ( $"Writing localization strings." );
+			AddRenamingStrings ( strings , newEngineNames );
+			StringsFile.WriteStrings ( stringsLocation , strings , overwrite: true );
 			Console.WriteLine ( "Done." );
 		}
 
 
 
+
 		private static List<KeyValuePair<string , string>> GetStrings ( DirectoryInfo directory , GameLanguage language , out Dictionary<string , string> map , out string location ) {
+			Console.WriteLine ( $"Reading localization strings for: {language}." );
 			location = Path.Combine ( directory.FullName , @$"[strings]\strings_{language}.str".ToLowerInvariant () );
-			var strings = StringsFile.ReadStrings ( location )
-				.Where ( a => !RenamedStringIdRegex.IsMatch ( a.Key ) ) //filter out new ids
-				.ToList ()
-				;
+			var strings = StringsFile.ReadStrings ( location ).ToList ();
 			map = strings
 				.GroupBy ( a => a.Key ) //there are multiple duplicates
 				.ToDictionary ( a => a.Key , a => a.First ().Value )
@@ -61,9 +129,32 @@ namespace SnowTruckConfig {
 			return strings;
 		}
 
+		private static void AddRenamingStrings ( List<KeyValuePair<string , string>> strings , IEnumerable<KeyValuePair<string , string>> newStrings ) {
+			var originalIds = new HashSet<string> ( newStrings.Select ( a => GetOriginalId ( a.Key ) ) );
+			strings.RemoveAll ( a => GetOriginalId ( a.Key , out var id ) && originalIds.Contains ( id ) );
+			strings.AddRange ( newStrings );
+		}
+
 		private static string GetNewId ( string originalId , string unique ) {
 			var crc = MiscHelpers.ComputeUtf8Crc32 ( unique );
-			return $"{originalId}_X_{crc:X8}"; //generate new ids to separate them from originals and to make them unique (there's reuse in original files)
+			return $"{originalId}_96FD3B99_{crc:X8}"; //generate new ids to separate them from originals and to make them unique (there's reuse in original files)
+		}
+
+		private static bool GetOriginalId ( string id , out string originalId ) {
+			var match = RenamedStringIdRegex.Match ( id );
+			if ( match.Success ) {
+				originalId = match.Groups[1].Value;
+				return true;
+			}
+			else {
+				originalId = id;
+				return false;
+			}
+		}
+
+		private static string GetOriginalId ( string id ) {
+			GetOriginalId ( id , out var originalId );
+			return originalId;
 		}
 
 		private static List<TireFriction> PrepareAndGetTires ( DirectoryInfo directory , Dictionary<string , TireFriction> globalFrictionTemplates ) {
@@ -90,8 +181,7 @@ namespace SnowTruckConfig {
 					var id = tire.Element ( "GameData" )?.Element ( "UiDesc" )?.Attribute ( "UiName" );
 					if ( id == null ) continue;
 
-					var match = RenamedStringIdRegex.Match ( id.Value );
-					var originalId = match.Success ? match.Groups[1].Value : id.Value;
+					var originalId = GetOriginalId ( id.Value );
 					var newId = GetNewId ( originalId , xmlLocation[directoryLocation.Length..] );
 					id.Value = newId;
 
@@ -107,7 +197,7 @@ namespace SnowTruckConfig {
 		}
 
 		private static string GetNewTireName ( string originalName , TireFriction tire ) {
-			return $"{originalName} {tire}";
+			return $"{originalName} | {tire}";
 		}
 
 
