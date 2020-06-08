@@ -148,7 +148,7 @@ namespace SnowPakTool {
 		public static string NormalizeDirectory ( string directory ) {
 			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
 			directory = Path.GetFullPath ( directory );
-			return directory[directory.Length - 1] == '\\' ? directory : directory + '\\';
+			return directory[^1] == '\\' ? directory : directory + '\\';
 		}
 
 		public static int ComputeCrc32 ( this Stream stream , long length ) {
