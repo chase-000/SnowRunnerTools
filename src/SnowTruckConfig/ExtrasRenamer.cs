@@ -62,10 +62,7 @@ namespace SnowTruckConfig {
 				var nameId = nameIdNode?.Value;
 				if ( nameId == null ) continue;
 				var originalId = GetOriginalId ( nameId );
-				var mass = root.Element ( "Truck" ).Element ( "PhysicsModel" )?.Descendants ( "Body" ).Attributes ( "Mass" )
-					.Select ( a => float.TryParse ( a.Value , out var f ) ? f : 0 )
-					.Sum ()
-					;
+				var mass = TruckHelpers.GetMass ( root.Element ( "Truck" ) );
 				if ( mass < 100 ) continue;
 
 				var newId = GetNewId ( originalId , truckXmlLocation[directoryLocation.Length..] );

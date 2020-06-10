@@ -1,6 +1,8 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using SnowPakTool;
@@ -24,9 +26,28 @@ namespace SnowTruckConfig {
 
 			var cmdTruckCustomizationCameras = new Command ( "CustomizationCameras" );
 			cmdTruckCustomizationCameras.AddOption ( new Option<int> ( "--FOV" ) { Required = true } );
-			cmdTruckCustomizationCameras.AddArgument ( new Argument<FileInfo> ( "targetXml" ).ExistingOnly () );
+			var targetXmlArgument = new Argument<FileInfo> ( "targetXml" ).ExistingOnly ();
+			cmdTruckCustomizationCameras.AddArgument ( targetXmlArgument );
 			cmdTruckCustomizationCameras.Handler = CommandHandler.Create<FileInfo , int> ( DoTruckCustomizationCameras );
 			cmdTruck.Add ( cmdTruckCustomizationCameras );
+
+
+			var cmdTruckCraneSocket = new Command ( "CraneSocket" );
+			cmdTruck.Add ( cmdTruckCraneSocket );
+
+			var cmdTruckCraneSocketAdd = new Command ( "add" );
+			cmdTruckCraneSocket.Add ( cmdTruckCraneSocketAdd );
+
+			var cmdTruckCraneSocketAddTopCentral = new Command ( "top-central" );
+			cmdTruckCraneSocketAddTopCentral.AddArgument ( targetXmlArgument );
+			cmdTruckCraneSocketAddTopCentral.Handler = CommandHandler.Create<FileInfo> ( DoTruckCraneSocketAddTopCentral );
+			cmdTruckCraneSocketAdd.Add ( cmdTruckCraneSocketAddTopCentral );
+
+
+			var cmdTruckExtents = new Command ( "extents" );
+			cmdTruckExtents.AddArgument ( targetXmlArgument );
+			cmdTruckExtents.Handler = CommandHandler.Create<FileInfo> ( DoTruckExtents );
+			cmdTruck.Add ( cmdTruckExtents );
 
 
 			var cmdExtras = new Command ( "extras" , "Extra configuration" );
@@ -69,6 +90,30 @@ namespace SnowTruckConfig {
 			foreach ( var position in positions ) {
 				position.Attribute ( "FOV" ).SetValue ( fov );
 			}
+		}
+
+		private static void DoTruckExtents ( FileInfo targetXml ) {
+			var xml = XmlHelpers.ReadFragments ( targetXml.FullName );
+			var extents = TruckHelpers.GetExtents ( xml.Element ( "Truck" ) );
+			Console.WriteLine ( $"Extents: {(extents.minX, extents.minY, extents.minZ)} .. {(extents.maxX, extents.maxY, extents.maxZ)}" );
+		}
+
+		private static int DoTruckCraneSocketAddTopCentral ( FileInfo targetXml ) {
+			var xml = XmlHelpers.ReadFragments ( targetXml.FullName );
+			var truck = xml.Element ( "Truck" );
+			var lastCraneSocket = truck.Element ( "GameData" ).Elements ( "CraneSocket" ).LastOrDefault ();
+			if ( lastCraneSocket == null ) {
+				Console.WriteLine ( "No existing crane sockets found!" );
+				return 1;
+			}
+			var extents = TruckHelpers.GetExtents ( truck );
+			var pos = $"(0; {extents.maxY:0.###}; 0)";
+			Console.WriteLine ( $"Adding new crane socket at {pos}" );
+			var newCraneSocket = new XElement ( "CraneSocket" , new XAttribute ( "Pos" , pos ) );
+			lastCraneSocket.AddAfterSelf ( newCraneSocket );
+			lastCraneSocket.AddAfterSelf ( new XText ( "\r\n\t\t" ) );
+			XmlHelpers.WriteFragments ( targetXml.FullName , xml.Nodes () );
+			return 0;
 		}
 
 	}
