@@ -30,6 +30,8 @@ snowpaktool pak pack --mixed-cache-block "initial-pak" "%client%\initial.pak"
 * Change customization cameras FOV
 * Rename game objects to include detailed info in their names
 
+This example adds a new crane socket to Hummer H2:
+
 ```bat
 set client=D:\Games\SnowRunner\en_us\preload\paks\client
 
