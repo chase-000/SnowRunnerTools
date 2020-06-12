@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
@@ -27,9 +28,11 @@ namespace SnowTruckConfig {
 			var cmdTruckCustomizationCameras = new Command ( "CustomizationCameras" );
 			cmdTruckCustomizationCameras.AddOption ( new Option<float?> ( "--FOV" ) );
 			cmdTruckCustomizationCameras.AddOption ( new Option<float?> ( "--MaxZoom" ) );
-			var targetXmlArgument = new Argument<FileInfo> ( "targetXml" ).ExistingOnly ();
+			var targetXmlArgument = new Argument<IEnumerable<FileInfo>> ( "targetXmls" , CommandLineExtensions.ParseWildcards ) {
+				Description = "Truck XML file to modify (wildcards supported)"
+			}.ExistingOrWildcardOnly ();
 			cmdTruckCustomizationCameras.AddArgument ( targetXmlArgument );
-			cmdTruckCustomizationCameras.Handler = CommandHandler.Create<FileInfo , float? , float?> ( DoTruckCustomizationCameras );
+			cmdTruckCustomizationCameras.Handler = CommandHandler.Create<IEnumerable<FileInfo> , float? , float?> ( DoTruckCustomizationCameras );
 			cmdTruck.Add ( cmdTruckCustomizationCameras );
 
 
@@ -80,11 +83,13 @@ namespace SnowTruckConfig {
 			return root.InvokeWithMiddleware ( args , CommandLineExtensions.MakePrintLicenseResourceMiddleware ( typeof ( Program ) ) );
 		}
 
-		private static void DoTruckCustomizationCameras ( FileInfo targetXml , float? fov , float? maxZoom ) {
-			Console.WriteLine ( $"Settings customization camera properties for: {targetXml.Name}" );
-			var xml = XmlHelpers.ReadFragments ( targetXml.FullName );
-			SetCustomizationCamerasFov ( xml , fov , maxZoom );
-			XmlHelpers.WriteFragments ( targetXml.FullName , xml.Nodes () );
+		private static void DoTruckCustomizationCameras ( IEnumerable<FileInfo> targetXmls , float? fov , float? maxZoom ) {
+			foreach ( var targetXml in targetXmls ) {
+				Console.WriteLine ( $"Settings customization camera properties for: {targetXml.Name}" );
+				var xml = XmlHelpers.ReadFragments ( targetXml.FullName );
+				SetCustomizationCamerasFov ( xml , fov , maxZoom );
+				XmlHelpers.WriteFragments ( targetXml.FullName , xml.Nodes () );
+			}
 		}
 
 		private static void SetCustomizationCamerasFov ( XElement xml , float? fov , float? maxZoom ) {

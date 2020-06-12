@@ -15,6 +15,7 @@ namespace SnowPakTool {
 
 		public static char[] InvalidPathChars { get; } = Path.GetInvalidPathChars ();
 		public static char[] InvalidNameChars { get; } = Path.GetInvalidFileNameChars ();
+		public static char[] Wildcards { get; } = new[] { '*' , '?' };
 
 
 		public static int ReadInt32 ( this Stream stream ) {
@@ -149,6 +150,24 @@ namespace SnowPakTool {
 			if ( directory is null ) throw new ArgumentNullException ( nameof ( directory ) );
 			directory = Path.GetFullPath ( directory );
 			return directory[^1] == '\\' ? directory : directory + '\\';
+		}
+
+		public static bool FileExistsOrWildcardDirectoryExists ( string location ) {
+			return FileExistsOrWildcardDirectoryExists ( location , out _ , out _ );
+		}
+
+		public static bool FileExistsOrWildcardDirectoryExists ( string location , out string directory , out string name ) {
+			if ( location is null ) throw new ArgumentNullException ( nameof ( location ) );
+			directory = Path.GetDirectoryName ( location );
+			name = Path.GetFileName ( location );
+			if ( location.IndexOfAny ( Wildcards ) < 0 ) {
+				return File.Exists ( location );
+			}
+			else {
+				if ( !Directory.Exists ( directory ) ) return false;
+				if ( name.Length <= 0 ) return false;
+				return name.IndexOfAny ( Path.GetInvalidFileNameChars () ) < 0;
+			}
 		}
 
 		public static int ComputeCrc32 ( this Stream stream , long length ) {

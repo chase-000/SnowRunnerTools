@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
@@ -44,6 +45,17 @@ namespace SnowPakTool {
 			return argument;
 		}
 
+		public static Argument<IEnumerable<FileInfo>> ExistingOrWildcardOnly ( this Argument<IEnumerable<FileInfo>> argument ) {
+			argument.AddValidator ( symbol =>
+				symbol.Tokens
+					.Select ( t => t.Value )
+					.Where ( IOHelpers.FileExistsOrWildcardDirectoryExists )
+					.Select ( a => $"File does not exist: {a}" )
+					.FirstOrDefault ()
+			);
+			return argument;
+		}
+
 		public static void AddLicenseOption ( this RootCommand root ) {
 			var optLicense = new Option ( LicenseOptionName , "Show licensing information" );
 			root.Add ( optLicense );
@@ -70,6 +82,22 @@ namespace SnowPakTool {
 				.Aggregate ( builder.UseDefaults () , ( builder , middleware ) => builder.UseMiddleware ( middleware ) )
 				.Build ();
 			return parser.Invoke ( args );
+		}
+
+		public static IEnumerable<FileInfo> ParseWildcards ( ArgumentResult result ) {
+			foreach ( var token in result.Tokens ) {
+				var location = token.Value;
+				if ( location.IndexOfAny ( IOHelpers.Wildcards ) < 0 ) {
+					yield return new FileInfo ( location );
+				}
+				else {
+					var directory = Path.GetDirectoryName ( location );
+					var name = Path.GetFileName ( location );
+					foreach ( var item in Directory.EnumerateFiles ( directory , name ) ) {
+						yield return new FileInfo ( item );
+					}
+				}
+			}
 		}
 
 
