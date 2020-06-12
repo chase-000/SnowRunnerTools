@@ -18,15 +18,17 @@ namespace SnowTruckConfig {
 		}
 
 		public static (float X, float Y, float Z) ParsePos ( string value ) {
-			var xStart = value.IndexOf ( '(' ) + 1;
-			if ( xStart > 0 ) {
-				var yStart = value.IndexOf ( ';' , xStart ) + 1;
-				if ( yStart > 0 && float.TryParse ( value[xStart..( yStart - 1 )] , out var x ) ) {
-					var zStart = value.IndexOf ( ';' , yStart ) + 1;
-					if ( zStart > 0 && float.TryParse ( value[yStart..( zStart - 1 )] , out var y ) ) {
-						var zEnd = value.IndexOf ( ')' , zStart );
-						if ( zStart >= 0 && float.TryParse ( value[zStart..zEnd] , out var z ) ) {
-							return (x, y, z);
+			if ( !string.IsNullOrEmpty ( value ) ) {
+				var xStart = value.IndexOf ( '(' ) + 1;
+				if ( xStart > 0 ) {
+					var yStart = value.IndexOf ( ';' , xStart ) + 1;
+					if ( yStart > 0 && float.TryParse ( value[xStart..( yStart - 1 )] , out var x ) ) {
+						var zStart = value.IndexOf ( ';' , yStart ) + 1;
+						if ( zStart > 0 && float.TryParse ( value[yStart..( zStart - 1 )] , out var y ) ) {
+							var zEnd = value.IndexOf ( ')' , zStart );
+							if ( zStart >= 0 && float.TryParse ( value[zStart..zEnd] , out var z ) ) {
+								return (x, y, z);
+							}
 						}
 					}
 				}

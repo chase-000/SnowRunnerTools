@@ -108,7 +108,7 @@ namespace SnowTruckConfig {
 			}
 			var extents = TruckHelpers.GetExtents ( truck );
 			var pos = $"(0; {extents.maxY:0.###}; 0)";
-			Console.WriteLine ( $"Adding new crane socket at {pos}" );
+			Console.WriteLine ( $"{targetXml.Name}: adding new crane socket at {pos}" );
 			var newCraneSocket = new XElement ( "CraneSocket" , new XAttribute ( "Pos" , pos ) );
 			lastCraneSocket.AddAfterSelf ( newCraneSocket );
 			lastCraneSocket.AddAfterSelf ( new XText ( "\r\n\t\t" ) );
