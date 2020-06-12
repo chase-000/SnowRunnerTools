@@ -25,10 +25,11 @@ namespace SnowTruckConfig {
 			root.Add ( cmdTruck );
 
 			var cmdTruckCustomizationCameras = new Command ( "CustomizationCameras" );
-			cmdTruckCustomizationCameras.AddOption ( new Option<int> ( "--FOV" ) { Required = true } );
+			cmdTruckCustomizationCameras.AddOption ( new Option<float?> ( "--FOV" ) );
+			cmdTruckCustomizationCameras.AddOption ( new Option<float?> ( "--MaxZoom" ) );
 			var targetXmlArgument = new Argument<FileInfo> ( "targetXml" ).ExistingOnly ();
 			cmdTruckCustomizationCameras.AddArgument ( targetXmlArgument );
-			cmdTruckCustomizationCameras.Handler = CommandHandler.Create<FileInfo , int> ( DoTruckCustomizationCameras );
+			cmdTruckCustomizationCameras.Handler = CommandHandler.Create<FileInfo , float? , float?> ( DoTruckCustomizationCameras );
 			cmdTruck.Add ( cmdTruckCustomizationCameras );
 
 
@@ -79,16 +80,22 @@ namespace SnowTruckConfig {
 			return root.InvokeWithMiddleware ( args , CommandLineExtensions.MakePrintLicenseResourceMiddleware ( typeof ( Program ) ) );
 		}
 
-		private static void DoTruckCustomizationCameras ( FileInfo targetXml , int fov ) {
+		private static void DoTruckCustomizationCameras ( FileInfo targetXml , float? fov , float? maxZoom ) {
+			Console.WriteLine ( $"Settings customization camera properties for: {targetXml.Name}" );
 			var xml = XmlHelpers.ReadFragments ( targetXml.FullName );
-			SetCustomizationCamerasFov ( xml , fov );
+			SetCustomizationCamerasFov ( xml , fov , maxZoom );
 			XmlHelpers.WriteFragments ( targetXml.FullName , xml.Nodes () );
 		}
 
-		private static void SetCustomizationCamerasFov ( XElement xml , int fov ) {
-			var positions = xml.Element ( "Truck" ).Element ( "GameData" ).Element ( "CustomizationCameras" ).Elements ( "CameraPos" );
-			foreach ( var position in positions ) {
-				position.Attribute ( "FOV" ).SetValue ( fov );
+		private static void SetCustomizationCamerasFov ( XElement xml , float? fov , float? maxZoom ) {
+			var cameraPositions = xml.Element ( "Truck" ).Element ( "GameData" ).Element ( "CustomizationCameras" ).Elements ( "CameraPos" );
+			foreach ( var position in cameraPositions ) {
+				if ( fov.HasValue ) {
+					position.Attribute ( "FOV" ).SetValue ( fov.Value );
+				}
+				if ( maxZoom.HasValue ) {
+					position.Attribute ( "MaxZoom" ).SetValue ( maxZoom.Value );
+				}
 			}
 		}
 
