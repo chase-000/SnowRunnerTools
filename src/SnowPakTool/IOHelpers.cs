@@ -164,9 +164,10 @@ namespace SnowPakTool {
 				return File.Exists ( location );
 			}
 			else {
-				if ( !Directory.Exists ( directory ) ) return false;
+				if ( directory.Length > 0 && !Directory.Exists ( directory ) ) return false;
 				if ( name.Length <= 0 ) return false;
-				return name.IndexOfAny ( Path.GetInvalidFileNameChars () ) < 0;
+				var noWilds = Wildcards.Aggregate ( name , ( a , c ) => a.Replace ( c , '_' ) );
+				return noWilds.IndexOfAny ( InvalidNameChars ) < 0;
 			}
 		}
 

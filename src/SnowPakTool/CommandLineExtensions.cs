@@ -49,7 +49,7 @@ namespace SnowPakTool {
 			argument.AddValidator ( symbol =>
 				symbol.Tokens
 					.Select ( t => t.Value )
-					.Where ( IOHelpers.FileExistsOrWildcardDirectoryExists )
+					.Where ( a => !IOHelpers.FileExistsOrWildcardDirectoryExists ( a ) )
 					.Select ( a => $"File does not exist: {a}" )
 					.FirstOrDefault ()
 			);
@@ -92,6 +92,7 @@ namespace SnowPakTool {
 				}
 				else {
 					var directory = Path.GetDirectoryName ( location );
+					if ( directory.Length == 0 ) directory = Directory.GetCurrentDirectory ();
 					var name = Path.GetFileName ( location );
 					foreach ( var item in Directory.EnumerateFiles ( directory , name ) ) {
 						yield return new FileInfo ( item );

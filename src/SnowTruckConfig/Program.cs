@@ -28,10 +28,10 @@ namespace SnowTruckConfig {
 			var cmdTruckCustomizationCameras = new Command ( "CustomizationCameras" );
 			cmdTruckCustomizationCameras.AddOption ( new Option<float?> ( "--FOV" ) );
 			cmdTruckCustomizationCameras.AddOption ( new Option<float?> ( "--MaxZoom" ) );
-			var targetXmlArgument = new Argument<IEnumerable<FileInfo>> ( "targetXmls" , CommandLineExtensions.ParseWildcards ) {
+			var targetXmlWildcardsArgument = new Argument<IEnumerable<FileInfo>> ( "targetXmls" , CommandLineExtensions.ParseWildcards ) {
 				Description = "Truck XML file to modify (wildcards supported)"
 			}.ExistingOrWildcardOnly ();
-			cmdTruckCustomizationCameras.AddArgument ( targetXmlArgument );
+			cmdTruckCustomizationCameras.AddArgument ( targetXmlWildcardsArgument );
 			cmdTruckCustomizationCameras.Handler = CommandHandler.Create<IEnumerable<FileInfo> , float? , float?> ( DoTruckCustomizationCameras );
 			cmdTruck.Add ( cmdTruckCustomizationCameras );
 
@@ -43,6 +43,7 @@ namespace SnowTruckConfig {
 			cmdTruckCraneSocket.Add ( cmdTruckCraneSocketAdd );
 
 			var cmdTruckCraneSocketAddTopCentral = new Command ( "top-central" );
+			var targetXmlArgument = new Argument<FileInfo> ( "targetXml" ).ExistingOnly ();
 			cmdTruckCraneSocketAddTopCentral.AddArgument ( targetXmlArgument );
 			cmdTruckCraneSocketAddTopCentral.Handler = CommandHandler.Create<FileInfo> ( DoTruckCraneSocketAddTopCentral );
 			cmdTruckCraneSocketAdd.Add ( cmdTruckCraneSocketAddTopCentral );
