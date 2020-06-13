@@ -1,0 +1,22 @@
+--- semitrailer_gooseneck_4.xml.orig	Tue Jan 01 03:00:00 1980
++++ semitrailer_gooseneck_4.xml	Thu Jun 11 18:54:05 2020
+@@ -334,6 +334,9 @@
+ 		<WinchSocket Pos="(2.635; 0.814; 1.24)" ParentFrame="BoneCargo_4_cdt" />
+ 		<WinchSocket Pos="(2.635; 0.814; -1.24)" ParentFrame="BoneCargo_4_cdt" />
+ 		<WinchSocket Pos="(7.245; 1.335; 0)" ParentFrame="BoneCargo_4_cdt" />
++		<WinchSocket Pos="(-7.73; 0.48; 0)" />
++		<WinchSocket Pos="(-5.38; 0.82; 1.3)" />
++		<WinchSocket Pos="(-5.38; 0.82; -1.3)" />
+ 		<UiDesc
+ 			UiDesc="UI_SEMITRAILER_GOOSENECK_3_DESC"
+ 			UiIcon30x30="trailerSemiImg30"
+@@ -345,6 +348,9 @@
+ 		<CraneSocket Pos="(2.635; 0.814; 1.24)" ParentFrame="BoneCargo_4_cdt" />
+ 		<CraneSocket Pos="(2.635; 0.814; -1.24)" ParentFrame="BoneCargo_4_cdt" />
+ 		<CraneSocket Pos="(7.245; 1.335; 0)" ParentFrame="BoneCargo_4_cdt" />
++		<CraneSocket Pos="(-7.73; 0.48; 0)" />
++		<CraneSocket Pos="(-5.38; 0.82; 1.3)" />
++		<CraneSocket Pos="(-5.38; 0.82; -1.3)" />
+ 		<AddonSlots
+ 			InitialOffset="(2.572; 0.92; 0)"
+ 			OffsetStep="(-2.559; 0; 0)"
