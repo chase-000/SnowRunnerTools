@@ -1,0 +1,48 @@
+--- voron_grad.xml.orig	Tue Jan 01 03:00:00 1980
++++ voron_grad.xml	Fri Jun 12 00:09:42 2020
+@@ -493,9 +493,7 @@
+ 			<!-- <Socket Names="Semitrailer, SemitrailerOiltank" Offset="(-2.817; 1.46; -0.002)" /> -->
+ 			<Socket Names="Semitrailer, SemitrailerOiltank" Offset="(-3.017; 1.46; -0.002)" />
+ 			<Socket Names="LargeSemitrailer, LargeSemitrailerOiltank" Offset="(-2; 1.62; -0.002)" />
+-			<Socket Names="Trailer" Offset="(-5; 1.013; 0)">
+-				<AddonsShift Offset="(0; 0; 0)" TrailerNamesBlock="Trailer" Types="MinicraneRU, FrameAddon" />
+-			</Socket>
++			<Socket Names="Trailer" Offset="(-5; 1.013; 0)" />
+ 		</AddonSockets>
+ 		<AddonSockets>
+ 			<!-- <Socket Names="SaddleLow" Offset="(-2.817; 1.16; -0.002)"> -->
+@@ -507,28 +505,28 @@
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; 0.015)" />
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; -0.015)" />
+ 			</Socket>
+-			<Socket Names="FrameAddon" Offset="(-2.100; 1.15; 0)" ParentFrame="BoneChassis_cdt">
++			<Socket Names="FrameAddon" Offset="(-2.02; 1.15; 0)" ParentFrame="BoneChassis_cdt">
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; 0.05)" />
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; -0.05)" />
+-				<AddonsShift Offset="(-0.9; 0; 0)" Types="MinicraneRU" />
++				<AddonsShift Offset="(-0.68; 0; 0)" Types="MinicraneRU" />
+ 			</Socket>
+-			<Socket Names="FrameAddonKung" Offset="(-2.350; 1.24; 0)" ParentFrame="BoneChassis_cdt">
++			<Socket Names="FrameAddonKung" Offset="(-2.33; 1.24; 0)" ParentFrame="BoneChassis_cdt">
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; -0.08)" />
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; 0.08)" />
+ 			</Socket>
+-			<Socket Names="FrameAddonTank" Offset="(-3.1; 1.15; 0)" ParentFrame="BoneChassis_cdt" />
++			<Socket Names="FrameAddonTank" Offset="(-2.95; 1.15; 0)" ParentFrame="BoneChassis_cdt" />
+ 			<!-- <Socket Names="BigCraneUs" NamesBlock="Minicrane, Semitrailer" Offset="(-2.85; 1.165; 0)" /> -->
+ 			<Socket Names="BigCraneRu" NamesBlock="MinicraneRU" Offset="(-3.1; 1.265; 0)">
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; -0.1; 0)" />
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; -0.1; 0)" />
+ 			</Socket>
+-			<Socket Names="FrameAddonMaintainer" NamesBlock="Trailer, MinicraneRU" Offset="(-2.87; 0.126; 0)" ParentFrame="BoneChassis_cdt" />
++			<Socket Names="FrameAddonMaintainer" NamesBlock="Trailer, MinicraneRU" Offset="(-2.7; 0.126; 0)" ParentFrame="BoneChassis_cdt" />
+ 		</AddonSockets>
+ 		<AddonSockets DefaultAddon="voron_grad_diff_lock_default">
+ 			<Socket Names="VoronGradDiffLock" Offset="(0; 0; 0)" ParentFrame="BoneChassis_cdt" />
+ 		</AddonSockets>
+ 		<AddonSockets>
+-			<Socket Names="MinicraneRU" NamesBlock="FrameAddonKung, FrameAddonTank" Offset="(-0.1; 1.16; 0)" />
++			<Socket Names="MinicraneRU" NamesBlock="FrameAddonKung, FrameAddonTank" Offset="(0.2; 1.15; 0)" />
+ 		</AddonSockets>
+ 	</GameData>
+ 	<ControlledConstraints>
