@@ -6,7 +6,7 @@
  	<TruckData
 -		FuelCapacity="1400"
 -		RepairsCapacity="300"
-+		FuelCapacity="1000"
++		FuelCapacity="800"
 +		RepairsCapacity="500"
  		WheelRepairsCapacity="5"
  	/>

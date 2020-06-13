@@ -1,0 +1,11 @@
+--- frame_addon_kung.xml.orig	Tue Jan 01 03:00:00 1980
++++ frame_addon_kung.xml	Sat Jun 13 23:15:38 2020
+@@ -17,7 +17,7 @@
+ </_templates>
+ <TruckAddon IsChassisFullOcclusion="true">
+ 	<TruckData
+-		RepairsCapacity="800"
++		RepairsCapacity="1000"
+ 		WheelRepairsCapacity="6"
+ 	/>
+ 	<PhysicsModel Mesh="trucks/addons/frame_addon_kung">

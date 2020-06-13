@@ -1,0 +1,13 @@
+--- trailer_addon_maintainer.xml.orig	Tue Jan 01 03:00:00 1980
++++ trailer_addon_maintainer.xml	Sat Jun 13 23:31:24 2020
+@@ -38,8 +38,8 @@
+ </_templates>
+ <Truck Type="Trailer">
+ 	<TruckData
+-		FuelCapacity="2000"
+-		RepairsCapacity="350"
++		FuelCapacity="1200"
++		RepairsCapacity="600"
+ 		WheelRepairsCapacity="6"
+ 	>
+ 		<Wheels>
