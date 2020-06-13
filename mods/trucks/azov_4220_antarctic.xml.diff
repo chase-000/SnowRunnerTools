@@ -1,0 +1,14 @@
+--- azov_4220_antarctic.xml.orig	Tue Jan 01 03:00:00 1980
++++ azov_4220_antarctic.xml	Fri Jun 12 12:56:32 2020
+@@ -459,7 +459,10 @@
+ 		<CraneSocket Pos="(-0.647; 1.743; -0.341)" ParentFrame="BoneBack_cdt" />
+ 		<CraneSocket Pos="(-0.647; 1.743; 0.341)" ParentFrame="BoneBack_cdt" />
+ 		<AddonSockets>
+-			<Socket Names="FrameAddon" Offset="(-2.47; 1.865; 0)" ParentFrame="BoneBack_cdt" />
++			<Socket Names="FrameAddon" Offset="(-2.52; 1.865; 0)" ParentFrame="BoneBack_cdt" />
++			<Socket Names="FrameAddonKung" Offset="(-3; 1.96; 0)" ParentFrame="BoneBack_cdt" />
++			<Socket Names="FrameAddonTank" Offset="(-3.6; 1.88; 0)" ParentFrame="BoneBack_cdt" />
++			<Socket Names="FrameAddonMaintainer" NamesBlock="Trailer" Offset="(-3.34; 0.85; 0)" ParentFrame="BoneBack_cdt" />
+ 		</AddonSockets>
+ 		<AddonSockets>
+ 			<Socket Names="Trailer" Offset="(-5.23; 1.265; 0)" ParentFrame="BoneBack_cdt" />
