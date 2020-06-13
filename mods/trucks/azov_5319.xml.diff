@@ -1,0 +1,31 @@
+--- azov_5319.xml.orig	Tue Jan 01 03:00:00 1980
++++ azov_5319.xml	Fri Jun 12 00:10:03 2020
+@@ -368,9 +368,7 @@
+ 		<CraneSocket Pos="(-1.747; 1.180; 0.482)" />
+ 		<CraneSocket Pos="(-4.602; 1.154; 0)" />
+ 		<AddonSockets>
+-			<Socket Names="Trailer" Offset="(-4.64; 1.155; 0)">
+-				<AddonsShift Offset="(0; 0; 0)" TrailerNamesBlock="Trailer" Types="MinicraneRU, FrameAddon" />
+-			</Socket>
++			<Socket Names="Trailer" Offset="(-4.64; 1.155; 0)" />
+ 			<Socket Names="Semitrailer, SemitrailerOiltank" NamesBlock="SaddleHigh" Offset="(-3.185; 1.655; 0)" />
+ 			<Socket Names="LargeSemitrailer, LargeSemitrailerOiltank" NamesBlock="SaddleLow" Offset="(-1.879; 1.835; 0)" />
+ 		</AddonSockets>
+@@ -384,7 +382,7 @@
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; 0.055)" />
+ 			</Socket>
+ 			<Socket Names="FrameAddon" Offset="(-1.725; 1.333; 0)">
+-				<AddonsShift Offset="(-1.35; 0; 0)" Types="MinicraneRU" />
++				<AddonsShift Offset="(-0.86; 0; 0)" Types="MinicraneRU" />
+ 			</Socket>
+ 			<Socket Names="FrameAddonTank" Offset="(-2.28; 1.337; 0)" />
+ 			<Socket Names="FrameAddonMaintainer" NamesBlock="Trailer" Offset="(-2.341; 0.304; 0)" ParentFrame="BoneChassis_cdt" />
+@@ -403,7 +401,7 @@
+ 			</Socket>
+ 		</AddonSockets>
+ 		<AddonSockets>
+-			<Socket Names="MinicraneRU" NamesBlock="FrameAddonTank, FrameAddonKung, BigCraneRu, BigCraneUs, FrameAddonMaintainer, FrameAddonSeismicVibrator, LargeSemitrailerOiltank" Offset="(-0.184; 1.336; 0)">
++			<Socket Names="MinicraneRU" NamesBlock="FrameAddonTank, FrameAddonKung, BigCraneRu, BigCraneUs, FrameAddonMaintainer, FrameAddonSeismicVibrator, LargeSemitrailerOiltank" Offset="(0.34; 1.336; 0)">
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; -0.07)" />
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; 0.07)" />
+ 			</Socket>
