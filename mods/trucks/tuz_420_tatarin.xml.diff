@@ -1,0 +1,12 @@
+--- tuz_420_tatarin.xml.orig	Tue Jan 01 03:00:00 1980
++++ tuz_420_tatarin.xml	Sat Jun 13 21:33:58 2020
+@@ -300,6 +300,9 @@
+ 		<CraneSocket Pos="(1.666; 1.585; 1.437)" />
+ 		<CraneSocket Pos="(-3.56; 1.43; 0)" />
+ 		<AddonSockets>
++			<Socket Names="Trailer" Offset="(-3.575; 1.43; 0)" />
++		</AddonSockets>
++		<AddonSockets>
+ 			<Socket Names="Tuz420TatarinTrunk" />
+ 		</AddonSockets>
+ 		<AddonSockets>
