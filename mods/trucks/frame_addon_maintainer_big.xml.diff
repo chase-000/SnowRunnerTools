@@ -1,0 +1,13 @@
+--- frame_addon_maintainer_big.xml.orig	Tue Jan 01 03:00:00 1980
++++ frame_addon_maintainer_big.xml	Fri Jun 12 15:09:49 2020
+@@ -25,8 +25,8 @@
+ 		RotationSpeed="3"
+ 	/>
+ 	<TruckData
+-		FuelCapacity="2000"
+-		RepairsCapacity="350"
++		FuelCapacity="1600"
++		RepairsCapacity="600"
+ 		WheelRepairsCapacity="6"
+ 	/>
+ 	<PhysicsModel Mesh="trucks/addons/frame_addon_maintainer_big">

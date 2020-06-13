@@ -1,0 +1,13 @@
+--- frame_addon_maintainer.xml.orig	Fri Jun 12 15:04:31 2020
++++ frame_addon_maintainer.xml	Fri Jun 12 15:08:21 2020
+@@ -20,8 +20,8 @@
+ </_templates>
+ <TruckAddon>
+ 	<TruckData
+-		FuelCapacity="1400"
+-		RepairsCapacity="300"
++		FuelCapacity="1000"
++		RepairsCapacity="500"
+ 		WheelRepairsCapacity="5"
+ 	/>
+ 	<PhysicsModel Mesh="trucks/addons/frame_addon_maintainer">
