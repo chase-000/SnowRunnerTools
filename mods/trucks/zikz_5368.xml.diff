@@ -1,0 +1,11 @@
+--- zikz_5368.xml.orig	Tue Jan 01 03:00:00 1980
++++ zikz_5368.xml	Sun Jun 14 15:46:09 2020
+@@ -361,7 +361,7 @@
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; 0.015)" />
+ 				<ExtraParent Frame="BoneChassis_cdt" Offset="(0; 0; -0.015)" />
+ 			</Socket>
+-			<Socket Names="FrameAddon" NamesBlock="Trailer" Offset="(-1.674; 1.021; 0)" ParentFrame="BoneChassis_cdt" />
++			<Socket Names="FrameAddon" Offset="(-1.58; 1.021; 0)" ParentFrame="BoneChassis_cdt" />
+ 			<Socket
+ 				Names="FrameAddonKung"
+ 				NamesBlock="zikz_5368WheelAddon"
