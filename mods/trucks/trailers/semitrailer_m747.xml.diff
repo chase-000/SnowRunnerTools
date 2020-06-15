@@ -1,0 +1,11 @@
+--- semitrailer_m747.xml.orig	Tue Jan 01 03:00:00 1980
++++ semitrailer_m747.xml	Sun Jun 14 12:00:45 2020
+@@ -227,7 +227,7 @@
+ 		<RequiredAddon _template="SaddleHigh" />
+ 		<InstallSocket Offset="(6; 1.793; 0)" Type="LargeSemitrailer" />
+ <!--		<AddonSlots InitialOffset="(0.986; 1.117; 0)" OffsetStep="(-2.559; 0; 0)" Quantity="3" />
+--->		<AddonSlots InitialOffset="(0.095; 1.346; 0.000)" OffsetStep="(-2.9; 0; 0)" ParentFrames="BoneChassis_cdt,BoneChassis_cdt,BoneChassis_cdt" Quantity="3" />
++-->		<AddonSlots InitialOffset="(0.97; 1.346; 0.000)" OffsetStep="(-2.45; 0; 0)" ParentFrames="BoneChassis_cdt,BoneChassis_cdt,BoneChassis_cdt" Quantity="4" />
+ 	</GameData>
+ 	<AutomaticIK>
+ 		<IKBone ModelFrame="BoneIKLegLeft1" ParentFrame="BoneLegLeft_cdt">
