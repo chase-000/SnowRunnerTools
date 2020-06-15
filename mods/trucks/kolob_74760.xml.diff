@@ -1,0 +1,14 @@
+--- kolob_74760.xml.orig	Tue Jan 01 03:00:00 1980
++++ kolob_74760.xml	Mon Jun 15 15:51:38 2020
+@@ -407,6 +407,11 @@
+ 		</AddonSockets>
+ 		<AddonSockets>
+ 			<Socket Names="SaddleHigh1" Offset="(-1.95; 1.65; -0)" />
++			<Socket Names="FrameAddon" Offset="(-2.7; 1.84; 0)" ParentFrame="BoneChassis_cdt" />
++			<Socket Names="FrameAddonTank" Offset="(-3.715; 1.595; 0)" ParentFrame="BoneChassis_cdt" />
++			<Socket Names="FrameAddonSeismicVibrator" NamesBlock="Trailer" Offset="(-0.85; 1.64; 0)" ParentFrame="BoneChassis_cdt" />
++			<Socket Names="FrameAddonKung" Offset="(-3.04; 1.74; 0)" ParentFrame="BoneChassis_cdt" />
++			<Socket Names="FrameAddonMaintainer" NamesBlock="Trailer" Offset="(-3.35; 0.8; 0)" ParentFrame="BoneChassis_cdt" />
+ 		</AddonSockets>
+ 		<AddonSockets DefaultAddon="kolob_74760_snorkel_default">
+ 			<Socket Names="Kolob74760Snorkel" Offset="(0; 0; 0)" />
